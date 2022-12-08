@@ -24,6 +24,18 @@ namespace aik_constraint{
     }
     B_vel.head<3>() += B_parent_pose.linear() * this->B_localvel_.head<3>();
     B_vel.tail<3>() += B_parent_pose.linear() * this->B_localvel_.tail<3>();
+    cnoid::Vector6 A_acc = cnoid::Vector6::Zero(); // world frame
+    if(this->A_link_){
+      A_acc.head<3>() += this->A_link_->dv();
+      A_acc.head<3>() += this->A_link_->dw().cross(A_parent_pose.linear() * this->A_localpos_.translation()) + this->A_link_->w().cross(A_parent_pose.linear() * this->A_localvel_.head<3>());
+      A_acc.tail<3>() += this->A_link_->dw();
+    }
+    cnoid::Vector6 B_acc = cnoid::Vector6::Zero(); // world frame
+    if(this->B_link_){
+      B_acc.head<3>() += this->B_link_->dv();
+      B_acc.head<3>() += this->B_link_->dw().cross(B_parent_pose.linear() * this->B_localpos_.translation()) + this->B_link_->w().cross(B_parent_pose.linear() * this->B_localvel_.head<3>());
+      B_acc.tail<3>() += this->B_link_->dw();
+    }
 
     cnoid::Vector6 pos_error; // world frame. A - B
     {
@@ -39,14 +51,19 @@ namespace aik_constraint{
     cnoid::Vector6 vel_error_eval; // eval frame. A - B
     vel_error_eval.head<3>() = (eval_R.transpose() * vel_error.head<3>()).eval();
     vel_error_eval.tail<3>() = (eval_R.transpose() * vel_error.tail<3>()).eval();
-    cnoid::Vector6 target_acc = this->ref_acc_ + this->pgain_.cwiseProduct(pos_error_eval) + this->dgain_.cwiseProduct(vel_error_eval); // eval frame. B - A
+    cnoid::Vector6 target_acc = cnoid::Vector6::Zero();
+    target_acc += this->ref_acc_;
+    target_acc += this->clamp(cnoid::Vector6(this->pgain_.cwiseProduct(pos_error_eval)), this->maxAccByPosError_);
+    target_acc += this->clamp(cnoid::Vector6(this->dgain_.cwiseProduct(vel_error_eval)), this->maxAccByVelError_);
+    target_acc += - (B_acc - A_acc); // eval frame. B - A
+    target_acc = this->clamp(target_acc, this->maxAcc_);
 
     {
       // B-Aの目標加速度を計算し、this->eq_に入れる
       if(this->eq_.rows()!=(this->weight_.array() > 0.0).count()) this->eq_ = Eigen::VectorXd((this->weight_.array() > 0.0).count());
       for(size_t i=0, idx=0; i<6; i++){
         if(this->weight_[i]>0.0) {
-          this->eq_[idx] = std::min(std::max(target_acc[i],-this->maxError_[i]),this->maxError_[i]) * this->weight_[i];
+          this->eq_[idx] = target_acc[i] * this->weight_[i];
           idx++;
         }
       }
@@ -98,7 +115,7 @@ namespace aik_constraint{
       this->jacobian_.resize((this->weight_.array() > 0.0).count(),this->jacobian_full_local_.cols());
       for(size_t i=0, idx=0;i<6;i++){
         if(this->weight_[i]>0.0) {
-          this->jacobian_.row(idx) = this->weight_[i] * this->jacobian_full_local_.row(i);
+          this->jacobian_.row(idx) = - this->weight_[i] * this->jacobian_full_local_.row(i); // マイナス: A-B をB-Aに変換
           idx++;
         }
       }

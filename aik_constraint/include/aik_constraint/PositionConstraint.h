@@ -14,7 +14,9 @@ namespace aik_constraint{
     //  P: pgain. evel座標系
     //  D: dgain. evel座標系
     //  ref_acc: eval_frame. feedforward目標加速度(B-A). ref_acc + pgain * error + dgain * derrorが目標加速度になる
-    //  maxError: エラーの頭打ち eval座標系. 目標加速度をmaxErrorで頭打ちしてからweight倍したものがgetEq()で返る
+    //  maxAcc: 目標加速度の頭打ち eval座標系. 目標加速度をmaxAccで頭打ちしてからweight倍したものがgetEq()で返る
+    //  maxAccByPosError: 目標加速度の頭打ち eval座標系.
+    //  maxAccByVelError: 目標加速度の頭打ち eval座標系.
     //  weight: コスト関数の重み. error * weight^2 * error. 0の成分はjacobianやerrorに含まれない. eval座標系
     //  link: parent link. nullptrならworld座標系を意味する
     //  localpos: parent link frame
@@ -37,8 +39,12 @@ namespace aik_constraint{
     cnoid::Vector6& pgain() { return pgain_;}
     const cnoid::Vector6& dgain() const { return dgain_;}
     cnoid::Vector6& dgain() { return dgain_;}
-    const cnoid::Vector6& maxError() const { return maxError_;}
-    cnoid::Vector6& maxError() { return maxError_;}
+    const cnoid::Vector6& maxAcc() const { return maxAcc_;}
+    cnoid::Vector6& maxAcc() { return maxAcc_;}
+    const cnoid::Vector6& maxAccByPosError() const { return maxAccByPosError_;}
+    cnoid::Vector6& maxAccByPosError() { return maxAccByPosError_;}
+    const cnoid::Vector6& maxAccByVelError() const { return maxAccByVelError_;}
+    cnoid::Vector6& maxAccByVelError() { return maxAccByVelError_;}
     const cnoid::Vector6& weight() const { return weight_;}
     cnoid::Vector6& weight() { return weight_;}
     const cnoid::LinkPtr& eval_link() const { return eval_link_;}
@@ -61,9 +67,11 @@ namespace aik_constraint{
     cnoid::Position B_localpos_ = cnoid::Position::Identity();
     cnoid::Vector6 B_localvel_ = cnoid::Vector6::Zero();
     cnoid::Vector6 ref_acc_ = cnoid::Vector6::Zero();
-    cnoid::Vector6 pgain_ = cnoid::Vector6::Ones();
-    cnoid::Vector6 dgain_ = 2 * cnoid::Vector6::Ones();
-    cnoid::Vector6 maxError_ = (cnoid::Vector6() << 0.1, 0.1, 0.1, 0.1, 0.1, 0.1).finished();
+    cnoid::Vector6 pgain_ = 400 * cnoid::Vector6::Ones();
+    cnoid::Vector6 dgain_ = 50 * cnoid::Vector6::Ones();
+    cnoid::Vector6 maxAcc_ = 15 * cnoid::Vector6::Ones();
+    cnoid::Vector6 maxAccByPosError_ = 5 * cnoid::Vector6::Ones();
+    cnoid::Vector6 maxAccByVelError_ = 10 * cnoid::Vector6::Ones();
     cnoid::Vector6 weight_ = cnoid::Vector6::Ones();
     cnoid::LinkPtr eval_link_ = nullptr;
     cnoid::Matrix3d eval_localR_ = cnoid::Matrix3d::Identity();

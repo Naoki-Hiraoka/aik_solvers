@@ -38,6 +38,10 @@ namespace aik_constraint{
 
     static size_t getJointDOF(const cnoid::LinkPtr& joint);
     static bool isJointsSame(const std::vector<cnoid::LinkPtr>& joints1,const std::vector<cnoid::LinkPtr>& joints2);
+    template<typename Derived>
+    static typename Derived::PlainObject clamp(const Eigen::MatrixBase<Derived>& value, const Eigen::MatrixBase<Derived>& limit_value) {
+      return value.array().max(-limit_value.array()).min(limit_value.array());
+    }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   protected:
