@@ -1,38 +1,20 @@
-#include <ik_constraint/JointAngleConstraint.h>
+#include <aik_constraint/JointAngleConstraint.h>
 #include <iostream>
 
-namespace IK{
-  bool JointAngleConstraint::checkConvergence () {
-    if(!this->joint_) return true;
+namespace aik_constraint{
+  void JointAngleConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
+    if(!this->joint_) return;
 
-    double error = std::min(std::max(this->joint_->q() - targetq_,-this->maxError_), this->maxError_);
+    double target_acc = 0.0;
+    target_acc += this->ref_acc_;
+    target_acc += this->clamp(this->pgain_ * (targetq_ - this->joint_->q()), this->maxAccByPosError_);
+    target_acc += this->clamp(this->dgain_ * (targetdq_ - this->joint_->dq()), this->maxAccByVelError_);
+    target_acc = this->clamp(target_acc, this->maxAcc_);
 
-    if(this->error_.rows() != 1) this->error_ = Eigen::VectorXd(1);
-    this->error_[0] = this->weight_ * error;
+    if(this->eq_.rows() != 1) this->eq_ = Eigen::VectorXd(1);
+    this->eq_[0] = this->weight_ * target_acc;
 
-    if(this->debuglevel_>=1){
-      std::cerr << "JointAngleConstraint" << std::endl;
-      std::cerr << "q" << std::endl;
-      std::cerr << this->joint_->q() << std::endl;
-      std::cerr << "targetq" << std::endl;
-      std::cerr << this->targetq_ << std::endl;
-    }
-
-    return std::fabs(error) < this->precision_;
-  }
-
-  const Eigen::VectorXd& JointAngleConstraint::calc_error () {
-    if(this->debuglevel_>=1){
-      std::cerr << "JointAngleConstraint" << std::endl;
-      std::cerr << "error" << std::endl;
-      std::cerr << this->error_ << std::endl;
-    }
-
-    return this->error_;
-  }
-
-  const Eigen::SparseMatrix<double,Eigen::RowMajor>& JointAngleConstraint::calc_jacobian (const std::vector<cnoid::LinkPtr>& joints) {
-    if(!this->is_joints_same(joints,this->jacobian_joints_) ||
+    if(!this->isJointsSame(joints,this->jacobian_joints_) ||
        this->joint_ != this->jacobian_joint_){
       this->jacobian_joints_ = joints;
       this->jacobian_joint_ = this->joint_;
@@ -59,11 +41,17 @@ namespace IK{
       }
     }
 
-    if(this->debuglevel_>=1){
-      std::cerr << "JointAngleConstraint" << std::endl;
+
+    if(this->debugLevel_>=1){
+      std::cerr << "JointAngleConstraint " << ((this->joint_)?this->joint_->name():"") <<  std::endl;
+      std::cerr << "q dq targetq targetdq" << std::endl;
+      std::cerr << this->joint_->q() << " " << this->joint_->dq() << " " << this->targetq_ << " " << this->targetdq_ << std::endl;
+      std::cerr << "eq" << std::endl;
+      std::cerr << this->eq_ << std::endl;
       std::cerr << "jacobian" << std::endl;
       std::cerr << this->jacobian_ << std::endl;
     }
-    return this->jacobian_;
+
+    return;
   }
 }

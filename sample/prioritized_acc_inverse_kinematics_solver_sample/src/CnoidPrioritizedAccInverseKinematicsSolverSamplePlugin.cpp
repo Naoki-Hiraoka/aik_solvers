@@ -4,6 +4,7 @@
 #include <choreonoid_viewer/choreonoid_viewer.h>
 #include "sample1_4limb.h"
 #include "sample2_4limb_unsolvable.h"
+#include "sample3_4limb_angle.h"
 
 namespace prioritized_acc_inverse_kinematics_solver_sample{
 
@@ -23,6 +24,14 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
   };
   typedef cnoid::ref_ptr<sample2_4limb_unsolvableItem> sample2_4limb_unsolvableItemPtr;
 
+  class sample3_4limb_angleItem : public choreonoid_viewer::ViewerBaseItem {
+  public:
+    static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample3_4limb_angleItem>("sample3_4limb_angleItem"); }
+  protected:
+    virtual void main() override{ sample3_4limb_angle(); return; }
+  };
+  typedef cnoid::ref_ptr<sample3_4limb_angleItem> sample3_4limb_angleItemPtr;
+
 
   class PrioritizedAccInverseKinematicsSolverSamplePlugin : public cnoid::Plugin
   {
@@ -36,6 +45,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     {
       sample1_4limbItem::initializeClass(this);
       sample2_4limb_unsolvableItem::initializeClass(this);
+      sample3_4limb_angleItem::initializeClass(this);
       return true;
     }
   };

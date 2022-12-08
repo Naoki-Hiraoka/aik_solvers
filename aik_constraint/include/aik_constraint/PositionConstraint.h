@@ -11,8 +11,8 @@ namespace aik_constraint{
   {
   public:
     //A_link中のA_localposの部位とB_link中のB_localposの部位を一致させる.
-    //  P: pgain. evel座標系
-    //  D: dgain. evel座標系
+    //  pgain: evel座標系
+    //  dgain: evel座標系
     //  ref_acc: eval_frame. feedforward目標加速度(B-A). ref_acc + pgain * error + dgain * derrorが目標加速度になる
     //  maxAcc: 目標加速度の頭打ち eval座標系. 目標加速度をmaxAccで頭打ちしてからweight倍したものがgetEq()で返る
     //  maxAccByPosError: 目標加速度の頭打ち eval座標系.
@@ -69,7 +69,7 @@ namespace aik_constraint{
     cnoid::Vector6 ref_acc_ = cnoid::Vector6::Zero();
     cnoid::Vector6 pgain_ = 400 * cnoid::Vector6::Ones();
     cnoid::Vector6 dgain_ = 50 * cnoid::Vector6::Ones();
-    cnoid::Vector6 maxAcc_ = 15 * cnoid::Vector6::Ones();
+    cnoid::Vector6 maxAcc_ = 15 * cnoid::Vector6::Ones(); // 歩行では10は出る. 15もたまに出る
     cnoid::Vector6 maxAccByPosError_ = 5 * cnoid::Vector6::Ones();
     cnoid::Vector6 maxAccByVelError_ = 10 * cnoid::Vector6::Ones();
     cnoid::Vector6 weight_ = cnoid::Vector6::Ones();
