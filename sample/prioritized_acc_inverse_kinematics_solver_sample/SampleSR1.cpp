@@ -1,8 +1,8 @@
-#include <prioritized_inverse_kinematics_solver/PrioritizedInverseKinematicsSolver.h>
+#include <prioritized_acc_inverse_kinematics_solver/PrioritizedAccInverseKinematicsSolver.h>
 #include <prioritized_qp_osqp/prioritized_qp_osqp.h>
-#include <ik_constraint/PositionConstraint.h>
-#include <ik_constraint/COMConstraint.h>
-#include <ik_constraint/JointAngleConstraint.h>
+#include <aik_constraint/PositionConstraint.h>
+//#include <ik_constraint/COMConstraint.h>
+//#include <ik_constraint/JointAngleConstraint.h>
 
 #include <cnoid/BodyLoader>
 #include <ros/package.h>
@@ -23,16 +23,18 @@ int main(void){
 
   for(int j=0; j < robot->numJoints(); ++j){
     robot->joint(j)->q() = reset_manip_pose[j];
+    robot->joint(j)->dq() = 0.0;
+    robot->joint(j)->ddq() = 0.0;
   }
-  robot->calcForwardKinematics();
+  robot->calcForwardKinematics(true,true);
   robot->calcCenterOfMass();
 
   // setup tasks
-  std::vector<std::shared_ptr<IK::IKConstraint> > constraints0;
-  std::vector<std::shared_ptr<IK::IKConstraint> > constraints1;
+  std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints0;
+  std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints1;
   {
     // task: rleg to target
-    std::shared_ptr<IK::PositionConstraint> constraint = std::make_shared<IK::PositionConstraint>();
+    std::shared_ptr<aik_constraint::PositionConstraint> constraint = std::make_shared<aik_constraint::PositionConstraint>();
     constraint->A_link() = robot->link("RLEG_ANKLE_R");
     constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.04);
     constraint->B_link() = nullptr;
@@ -41,25 +43,25 @@ int main(void){
   }
   {
     // task: lleg to target
-    std::shared_ptr<IK::PositionConstraint> constraint = std::make_shared<IK::PositionConstraint>();
+    std::shared_ptr<aik_constraint::PositionConstraint> constraint = std::make_shared<aik_constraint::PositionConstraint>();
     constraint->A_link() = robot->link("LLEG_ANKLE_R");
     constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.04);
     constraint->B_link() = nullptr;
     constraint->B_localpos().translation() = cnoid::Vector3(0.0,0.2,0.0);
     constraints1.push_back(constraint);
   }
-  {
-    // task: COM to target
-    std::shared_ptr<IK::COMConstraint> constraint = std::make_shared<IK::COMConstraint>();
-    constraint->A_robot() = robot;
-    constraint->B_localp() = cnoid::Vector3(0.0,0.0,0.7);
-    constraints1.push_back(constraint);
-  }
+  // {
+  //   // task: COM to target
+  //   std::shared_ptr<aik_constraint::COMConstraint> constraint = std::make_shared<aik_constraint::COMConstraint>();
+  //   constraint->A_robot() = robot;
+  //   constraint->B_localp() = cnoid::Vector3(0.0,0.0,0.7);
+  //   constraints1.push_back(constraint);
+  // }
 
-  std::vector<std::shared_ptr<IK::IKConstraint> > constraints2;
+  std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints2;
   {
     // task: rarm to target. never reach
-    std::shared_ptr<IK::PositionConstraint> constraint = std::make_shared<IK::PositionConstraint>();
+    std::shared_ptr<aik_constraint::PositionConstraint> constraint = std::make_shared<aik_constraint::PositionConstraint>();
     constraint->A_link() = robot->link("RARM_WRIST_R");
     constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.02);
     constraint->B_link() = nullptr;
@@ -69,7 +71,7 @@ int main(void){
   }
   {
     // task: larm to target. rotation-axis nil
-    std::shared_ptr<IK::PositionConstraint> constraint = std::make_shared<IK::PositionConstraint>();
+    std::shared_ptr<aik_constraint::PositionConstraint> constraint = std::make_shared<aik_constraint::PositionConstraint>();
     constraint->A_link() = robot->link("LARM_WRIST_R");
     constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.02);
     constraint->B_link() = nullptr;
@@ -79,14 +81,14 @@ int main(void){
     constraints2.push_back(constraint);
   }
 
-  std::vector<std::shared_ptr<IK::IKConstraint> > constraints3;
-  {
-    // task: joint angle to target
-    std::shared_ptr<IK::JointAngleConstraint> constraint = std::make_shared<IK::JointAngleConstraint>();
-    constraint->joint() = robot->link("CHEST");
-    constraint->targetq() = 0.1;
-    constraints3.push_back(constraint);
-  }
+  std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints3;
+  // {
+  //   // task: joint angle to target
+  //   std::shared_ptr<aik_constraint::JointAngleConstraint> constraint = std::make_shared<aik_constraint::JointAngleConstraint>();
+  //   constraint->joint() = robot->link("CHEST");
+  //   constraint->targetq() = 0.1;
+  //   constraints3.push_back(constraint);
+  // }
 
 
   std::vector<std::shared_ptr<prioritized_qp_base::Task> > tasks;
@@ -95,27 +97,19 @@ int main(void){
   for(size_t i=0;i<robot->numJoints();i++){
     variables.push_back(robot->joint(i));
   }
-  std::vector<std::vector<std::shared_ptr<IK::IKConstraint> > > constraints{constraints0,constraints1,constraints2,constraints3};
+  std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > > constraints{constraints0,constraints1,constraints2,constraints3};
   for(size_t i=0;i<constraints.size();i++){
     for(size_t j=0;j<constraints[i].size();j++){
-      constraints[i][j]->debuglevel() = 1;//debug
+      constraints[i][j]->debugLevel() = 1;//debug
     }
   }
-  prioritized_inverse_kinematics_solver::IKParam param;
+  prioritized_acc_inverse_kinematics_solver::IKParam param;
   param.debugLevel = 1;
-  param.maxIteration = 40;
-  int loop = prioritized_inverse_kinematics_solver::solveIKLoop(variables,
-                                                                constraints,
-                                                                tasks,
-                                                                param);
+  bool solved = prioritized_acc_inverse_kinematics_solver::solveAIK(variables,
+                                                                    constraints,
+                                                                    tasks,
+                                                                    param);
 
-  std::cerr << "loop: " << loop << std::endl;
+  std::cerr << "solved: " << solved << std::endl;
 
-  for(size_t i=0;i<constraints.size();i++){
-    for(size_t j=0;j<constraints[i].size();j++){
-      constraints[i][j]->debuglevel() = 0;//not debug
-      if(constraints[i][j]->checkConvergence()) std::cerr << "constraint " << i << " " << j << ": converged"<< std::endl;
-      else std::cerr << "constraint " << i << ": NOT converged"<< std::endl;
-    }
-  }
 }

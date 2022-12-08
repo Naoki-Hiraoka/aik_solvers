@@ -174,8 +174,8 @@ namespace aik_constraint {
                             const std::vector<cnoid::LinkPtr>& path_A_joints, //input
                             const std::vector<cnoid::LinkPtr>& path_B_joints, //input
                             const std::vector<cnoid::LinkPtr>& path_BA_joints, //input
-                            const bool& calcRotation, // input. falseならtranslationのみ
                             const int& path_BA_joints_numUpwardConnections, //input
+                            const bool& calcRotation, // input. falseならtranslationのみ
                             Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian //output
                             ) {
     if(!A_link || !B_link || !(A_link->body() == B_link->body())){

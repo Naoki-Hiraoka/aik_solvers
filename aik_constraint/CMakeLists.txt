@@ -10,7 +10,7 @@ find_package(choreonoid REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ik_constraint
+  LIBRARIES aik_constraint
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS CHOREONOID
 )

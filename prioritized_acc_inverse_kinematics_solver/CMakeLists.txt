@@ -5,23 +5,21 @@ add_compile_options(-std=c++14)
 set(CMAKE_BUILD_TYPE Release)
 
 find_package(catkin REQUIRED COMPONENTS
-  ik_constraint
+  aik_constraint
   prioritized_qp_osqp
   )
 find_package(choreonoid REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES prioritized_inverse_kinematics_solver
-  CATKIN_DEPENDS ik_constraint prioritized_qp_osqp
+  LIBRARIES prioritized_acc_inverse_kinematics_solver
+  CATKIN_DEPENDS aik_constraint prioritized_qp_osqp
 )
 
 ###########
 ## Build ##
 ###########
 
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
 include_directories(
  include
  ${catkin_INCLUDE_DIRS}
@@ -36,7 +34,7 @@ foreach(lib ${CHOREONOID_BODY_LIBRARIES})
 endforeach(lib)
 
 add_library(${PROJECT_NAME}
-  src/PrioritizedInverseKinematicsSolver.cpp
+  src/PrioritizedAccInverseKinematicsSolver.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -63,7 +61,6 @@ install(DIRECTORY include/${PROJECT_NAME}/
 ## Testing ##
 #############
 
-add_subdirectory(sample)
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_prioritized_inverse_kinematics_solver.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
