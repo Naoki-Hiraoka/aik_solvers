@@ -1,9 +1,8 @@
-#include <ik_constraint/COMConstraint.h>
-#include <ik_constraint/Jacobian.h>
+#include <aik_constraint/COMConstraint.h>
+#include <aik_constraint/Jacobian.h>
 
-namespace IK{
-  bool COMConstraint::checkConvergence () {
-    bool converged = true;
+namespace aik_constraint{
+  void COMConstraint::update () {
 
     // A - B
     cnoid::Vector3 A_p = this->A_robot_ ? this->A_robot_->centerOfMass() + this->A_localp() : this->A_localp();

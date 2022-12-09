@@ -1,12 +1,12 @@
-#ifndef COMCONSTRAINT_H
-#define COMCONSTRAINT_H
+#ifndef AIK_CONSTRAINT_COMCONSTRAINT_H
+#define AIK_CONSTRAINT_COMCONSTRAINT_H
 
-#include <ik_constraint/IKConstraint.h>
+#include <aik_constraint/IKConstraint.h>
 #include <cnoid/EigenUtil>
 #include <cnoid/SceneMarkers>
 #include <iostream>
 
-namespace IK{
+namespace aik_constraint{
   class COMConstraint : public IKConstraint
   {
   public:
@@ -23,66 +23,57 @@ namespace IK{
     cnoid::BodyPtr& A_robot() { return A_robot_;}
     const cnoid::Vector3& A_localp() const { return A_localp_;}
     cnoid::Vector3& A_localp() { return A_localp_;}
+    const cnoid::Vector3& A_localv() const { return A_localv_;}
+    cnoid::Vector3& A_localv() { return A_localv_;}
     const cnoid::BodyPtr& B_robot() const { return B_robot_;}
     cnoid::BodyPtr& B_robot() { return B_robot_;}
     const cnoid::Vector3& B_localp() const { return B_localp_;}
     cnoid::Vector3& B_localp() { return B_localp_;}
+    const cnoid::Vector3& B_localv() const { return B_localv_;}
+    cnoid::Vector3& B_localv() { return B_localv_;}
     const cnoid::Matrix3d& eval_R() const { return eval_R_;}
     cnoid::Matrix3d& eval_R() { return eval_R_;}
 
-    // for equality
-    const cnoid::Vector3& maxError() const { return maxError_;}
-    cnoid::Vector3& maxError() { return maxError_;}
-    const cnoid::Vector3& precision() const { return precision_;}
-    cnoid::Vector3& precision() { return precision_;}
+    const cnoid::Vector6& ref_acc() const { return ref_acc_;}
+    cnoid::Vector6& ref_acc() { return ref_acc_;}
+    const cnoid::Vector6& pgain() const { return pgain_;}
+    cnoid::Vector6& pgain() { return pgain_;}
+    const cnoid::Vector6& dgain() const { return dgain_;}
+    cnoid::Vector6& dgain() { return dgain_;}
+    const cnoid::Vector6& maxAcc() const { return maxAcc_;}
+    cnoid::Vector6& maxAcc() { return maxAcc_;}
+    const cnoid::Vector6& maxAccByPosError() const { return maxAccByPosError_;}
+    cnoid::Vector6& maxAccByPosError() { return maxAccByPosError_;}
+    const cnoid::Vector6& maxAccByVelError() const { return maxAccByVelError_;}
+    cnoid::Vector6& maxAccByVelError() { return maxAccByVelError_;}
     const cnoid::Vector3& weight() const { return weight_;}
     cnoid::Vector3& weight() { return weight_;}
 
-    // for inequality. (c * 重心位置)をdlとduの範囲内にする.
-    const Eigen::SparseMatrix<double,Eigen::RowMajor>& C() const { return C_;}
-    Eigen::SparseMatrix<double,Eigen::RowMajor>& C() { return C_;}
-    const cnoid::VectorX& dl() const { return dl_;}
-    cnoid::VectorX& dl() { return dl_;}
-    const cnoid::VectorX& du() const { return du_;}
-    cnoid::VectorX& du() { return du_;}
-    const cnoid::VectorX& maxCError() const { return maxCError_;}
-    cnoid::VectorX& maxCError() { return maxCError_;}
-    const cnoid::VectorX& CPrecision() const { return CPrecision_;}
-    cnoid::VectorX& CPrecision() { return CPrecision_;}
+    void update () override;
 
-    // 収束判定
-    bool checkConvergence () override;
-
-    const Eigen::VectorXd& calc_error () override;
-    const Eigen::SparseMatrix<double,Eigen::RowMajor>& calc_jacobian (const std::vector<cnoid::LinkPtr>& joints) override;
-    const Eigen::SparseMatrix<double,Eigen::RowMajor>& calc_jacobianineq (const std::vector<cnoid::LinkPtr>& joints) override;
-    const Eigen::VectorXd& calc_minineq () override;
-    const Eigen::VectorXd& calc_maxineq () override;
   protected:
     cnoid::BodyPtr A_robot_ = nullptr;
     cnoid::Vector3 A_localp_ = cnoid::Vector3::Zero();
+    cnoid::Vector3 A_localv_ = cnoid::Vector3::Zero();
     cnoid::BodyPtr B_robot_ = nullptr;
+    cnoid::Vector3 B_localp_ = cnoid::Vector3::Zero();
     cnoid::Vector3 B_localp_ = cnoid::Vector3::Zero();
     cnoid::Matrix3d eval_R_ = cnoid::Matrix3d::Identity();
 
-    cnoid::Vector3 maxError_ = 0.1 * cnoid::Vector3::Ones();
-    cnoid::Vector3 precision_ = 1e-4 * cnoid::Vector3::Ones();
+    cnoid::Vector3 ref_acc_ = cnoid::Vector3::Zero();
+    cnoid::Vector3 pgain_ = 400 * cnoid::Vector3::Ones();
+    cnoid::Vector3 dgain_ = 50 * cnoid::Vector3::Ones();
+    cnoid::Vector3 maxAcc_ = 15 * cnoid::Vector3::Ones(); // 歩行では10は出る. 15もたまに出る
+    cnoid::Vector3 maxAccByPosError_ = 5 * cnoid::Vector3::Ones();
+    cnoid::Vector3 maxAccByVelError_ = 10 * cnoid::Vector3::Ones();
     cnoid::Vector3 weight_ = cnoid::Vector3::Ones();
-
-    Eigen::SparseMatrix<double,Eigen::RowMajor> C_;
-    cnoid::VectorX dl_;
-    cnoid::VectorX du_;
-    cnoid::VectorX maxCError_;
-    cnoid::VectorX CPrecision_;
 
     cnoid::BodyPtr jacobian_A_robot_ = nullptr;// 前回のjacobian計算時のrobot
     cnoid::BodyPtr jacobian_B_robot_ = nullptr;// 前回のjacobian計算時のrobot
+    std::vector<cnoid::LinkPtr> jacobian_joints_; // 前回のjacobian計算時のjoints
     Eigen::SparseMatrix<double,Eigen::RowMajor> jacobian_full_;
     Eigen::SparseMatrix<double,Eigen::RowMajor> jacobian_full_local_;
-    cnoid::BodyPtr jacobianineq_A_robot_ = nullptr;// 前回のjacobian計算時のrobot
-    cnoid::BodyPtr jacobianineq_B_robot_ = nullptr;// 前回のjacobian計算時のrobot
-    Eigen::SparseMatrix<double,Eigen::RowMajor> jacobianineq_full_;
-    Eigen::SparseMatrix<double,Eigen::RowMajor> jacobianineq_full_local_;
+    std::unordered_map<cnoid::LinkPtr,int> jacobianColMap_;
 
   };
 }

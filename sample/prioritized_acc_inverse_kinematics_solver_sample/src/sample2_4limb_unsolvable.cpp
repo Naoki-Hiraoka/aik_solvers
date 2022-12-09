@@ -2,6 +2,7 @@
 #include <cnoid/Body>
 #include <cnoid/BodyLoader>
 #include <cnoid/SceneMarkers>
+#include <cnoid/src/Body/InverseDynamics.h>
 #include <iostream>
 #include <ros/package.h>
 #include "sample2_4limb_unsolvable.h"
@@ -33,8 +34,10 @@ void sample2_4limb_unsolvable(){
     robot->joint(j)->dq() = 0.0;
     robot->joint(j)->ddq() = 0.0;
   }
+  for(int l=0;l<robot->numLinks();l++) robot->link(l)->F_ext().setZero();
   robot->calcForwardKinematics(true,true);
   robot->calcCenterOfMass();
+  robot->rootLink()->F_ext() = cnoid::calcInverseDynamics(robot->rootLink());
 
 
   // setup viewer
@@ -140,8 +143,10 @@ void sample2_4limb_unsolvable(){
       robot->joint(j)->dq() += robot->joint(j)->ddq() * dt;
       robot->joint(j)->ddq() = 0.0;
     }
+    for(int l=0;l<robot->numLinks();l++) robot->link(l)->F_ext().setZero();
     robot->calcForwardKinematics(true, true);
     robot->calcCenterOfMass();
+    robot->rootLink()->F_ext() = cnoid::calcInverseDynamics(robot->rootLink());
 
     // sleep
     //std::this_thread::sleep_for(std::chrono::milliseconds(int(dt * 1000 / 2)));

@@ -2,6 +2,7 @@
 #include <cnoid/Body>
 #include <cnoid/BodyLoader>
 #include <cnoid/SceneMarkers>
+#include <cnoid/src/Body/InverseDynamics.h>
 #include <iostream>
 #include <ros/package.h>
 #include "sample1_4limb.h"
@@ -33,9 +34,10 @@ void sample1_4limb(){
     robot->joint(j)->dq() = 0.0;
     robot->joint(j)->ddq() = 0.0;
   }
+  for(int l=0;l<robot->numLinks();l++) robot->link(l)->F_ext().setZero();
   robot->calcForwardKinematics(true,true);
   robot->calcCenterOfMass();
-
+  robot->rootLink()->F_ext() = cnoid::calcInverseDynamics(robot->rootLink());
 
   // setup viewer
   choreonoid_viewer::Viewer viewer;
@@ -104,7 +106,7 @@ void sample1_4limb(){
 
   // main loop
   double dt = 0.002;
-  for(int i=0;i< 10 / dt;i++){
+  for(int i=0;i< 300 / dt;i++){
     prioritized_acc_inverse_kinematics_solver::IKParam param;
     param.debugLevel = debugLevel;
     bool solved = prioritized_acc_inverse_kinematics_solver::solveAIK(variables,
@@ -140,11 +142,13 @@ void sample1_4limb(){
       robot->joint(j)->dq() += robot->joint(j)->ddq() * dt;
       robot->joint(j)->ddq() = 0.0;
     }
+    for(int l=0;l<robot->numLinks();l++) robot->link(l)->F_ext().setZero();
     robot->calcForwardKinematics(true, true);
     robot->calcCenterOfMass();
+    robot->rootLink()->F_ext() = cnoid::calcInverseDynamics(robot->rootLink());
 
     // sleep
-    std::this_thread::sleep_for(std::chrono::milliseconds(int(dt * 1000 / 2)));
+    //std::this_thread::sleep_for(std::chrono::milliseconds(int(dt * 1000 / 2)));
   }
 
   return;
