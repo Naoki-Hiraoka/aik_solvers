@@ -6,6 +6,7 @@ set(CMAKE_BUILD_TYPE Release)
 
 find_package(catkin REQUIRED COMPONENTS
   aik_constraint
+  aik_constraint_vclip
   prioritized_acc_inverse_kinematics_solver
   roslib
   choreonoid_viewer
@@ -50,6 +51,7 @@ add_library(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin SHARED
   src/sample5_com.cpp
   src/sample6_wolimit.cpp
   src/sample7_limit.cpp
+  src/sample8_collision.cpp
 )
 target_link_libraries(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin
   ${catkin_LIBRARIES}

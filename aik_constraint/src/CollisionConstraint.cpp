@@ -114,7 +114,7 @@ namespace aik_constraint{
       this->lines_ = new cnoid::SgLineSet;
       this->lines_->setLineWidth(1.0);
       this->lines_->getOrCreateColors()->resize(1);
-      this->lines_->getOrCreateColors()->at(0) = cnoid::Vector3f(0.0,0.0,0.5);
+      this->lines_->getOrCreateColors()->at(0) = cnoid::Vector3f(0.3,0.3,0.5);
       // A, B
       this->lines_->getOrCreateVertices()->resize(2);
       this->lines_->colorIndices().resize(0);

@@ -7,7 +7,6 @@ namespace aik_constraint{
   class CollisionConstraint : public IKConstraint
   {
   public:
-    CollisionConstraint();
 
     // A_linkとB_linkの干渉を回避する
     //  tolerance: この値以上離す[m]
