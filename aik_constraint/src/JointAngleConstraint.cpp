@@ -6,6 +6,8 @@ namespace aik_constraint{
     if(!this->joint_ || !(this->joint_->isRotationalJoint() || this->joint_->isPrismaticJoint())) {
       this->eq_.resize(0);
       this->jacobian_.resize(0,0);
+      this->jacobian_joint_ = nullptr;
+      this->jacobian_joints_.resize(0);
       this->minIneq_.resize(0);
       this->maxIneq_.resize(0);
       this->jacobianIneq_.resize(0,0);

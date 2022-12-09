@@ -57,6 +57,25 @@ namespace aik_constraint {
                           Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
                           );
 
+  namespace cnoid18 {
+    void calcAngularMomentumJacobian(cnoid::Body* body, cnoid::Link* base, Eigen::MatrixXd& H);
+  }
+
+  void calcAngularMomentumJacobianShape(const std::vector<cnoid::LinkPtr>& joints,//input
+                                        const cnoid::BodyPtr& A_robot,//input
+                                        const cnoid::BodyPtr& B_robot,//input
+                                        Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian,//output
+                                        std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap //output
+                                        );
+  void calcAngularMomentumJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
+                                       const cnoid::BodyPtr& A_robot,//input
+                                       const cnoid::BodyPtr& B_robot,//input
+                                       const Eigen::MatrixXd& A_AMJ, //[joint root]の順. comまわり input
+                                       const Eigen::MatrixXd& B_AMJ, //[joint root]の順. comまわり input
+                                       std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
+                                       Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
+                                       );
+
 }
 
 #endif

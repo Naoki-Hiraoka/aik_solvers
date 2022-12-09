@@ -45,6 +45,13 @@ namespace aik_constraint{
     static typename Derived::PlainObject clamp(const Eigen::MatrixBase<Derived>& value, const Eigen::MatrixBase<Derived>& limit_value) {
       return value.array().max(-limit_value.array()).min(limit_value.array());
     }
+    static Eigen::SparseMatrix<double,Eigen::RowMajor> cross(const cnoid::Vector3 v){
+      Eigen::SparseMatrix<double,Eigen::RowMajor> m(3,3);
+      m.insert(0,1) = -v[2]; m.insert(0,2) = v[1];
+      m.insert(1,0) = -v[2]; m.insert(1,2) = -v[0];
+      m.insert(2,0) = -v[1]; m.insert(2,1) = v[0];
+      return m;
+    }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   protected:

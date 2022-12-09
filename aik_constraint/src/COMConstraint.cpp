@@ -16,10 +16,8 @@ namespace aik_constraint{
     if(this->A_robot_) {
       cnoid::VectorX dq(this->A_robot_->numJoints()+6);
       for(int i=0;i<this->A_robot_->numJoints();i++) dq[i] = this->A_robot_->joint(i)->dq();
-      for(int i=0;i<3;i++) {
-        dq[this->A_robot_->numJoints()+i] = this->A_robot_->rootLink()->v()[i];
-        dq[this->A_robot_->numJoints()+3+i] = this->A_robot_->rootLink()->w()[i];
-      }
+      dq.segment<3>(this->A_robot_->numJoints()) = this->A_robot_->rootLink()->v();
+      dq.tail<3>() = this->A_robot_->rootLink()->w();
       A_v = A_CMJ * dq;
     }
     A_v += this->A_localv_;
@@ -42,15 +40,17 @@ namespace aik_constraint{
     // A - B
     cnoid::Vector3 pos_error = A_p - B_p; // world frame A - B
     cnoid::Vector3 vel_error = A_v - B_v; // world frame A - B
+    cnoid::Vector3 acc_error = A_a - B_a; // world frame A - B
 
     cnoid::Vector3 pos_error_eval = this->eval_R_.transpose() * pos_error; // eval frame A - B
     cnoid::Vector3 vel_error_eval = this->eval_R_.transpose() * vel_error; // eval frame A - B
+    cnoid::Vector3 acc_error_eval = this->eval_R_.transpose() * acc_error; // eval frame A - B
 
     cnoid::Vector3 target_acc = cnoid::Vector3::Zero();  // eval frame A - B
     target_acc += this->ref_acc_;
     target_acc -= this->clamp(cnoid::Vector3(this->pgain_.cwiseProduct(pos_error_eval)), this->maxAccByPosError_);
     target_acc -= this->clamp(cnoid::Vector3(this->dgain_.cwiseProduct(vel_error_eval)), this->maxAccByVelError_);
-    target_acc -= A_a - B_a;
+    target_acc -= acc_error_eval;
     target_acc = this->clamp(target_acc, this->maxAcc_);
 
 
