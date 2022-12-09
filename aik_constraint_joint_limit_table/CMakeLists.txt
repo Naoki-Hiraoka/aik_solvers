@@ -5,15 +5,15 @@ add_compile_options(-std=c++11)
 set(CMAKE_BUILD_TYPE Release)
 
 find_package(catkin REQUIRED COMPONENTS
-  ik_constraint
+  aik_constraint
   joint_limit_table)
 
 find_package(choreonoid REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES ik_constraint_joint_limit_table
-  CATKIN_DEPENDS joint_limit_table ik_constraint
+  LIBRARIES aik_constraint_joint_limit_table
+  CATKIN_DEPENDS joint_limit_table aik_constraint
 #  DEPENDS system_lib
 )
 

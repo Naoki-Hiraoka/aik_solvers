@@ -31,6 +31,9 @@ namespace aik_constraint{
     void update (const std::vector<cnoid::LinkPtr>& joints) override;
 
   protected:
+    virtual double get_q_lower() { return this->joint_->q_lower(); } // this->joint_はnullptrではない前提
+    virtual double get_q_upper() { return this->joint_->q_upper(); } // this->joint_はnullptrではない前提
+
     cnoid::LinkPtr joint_ = nullptr;
     double pgain_ = 400;
     double dgain_ = 50;

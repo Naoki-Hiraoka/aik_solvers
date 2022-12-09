@@ -1,20 +1,21 @@
-#ifndef IKCONSTRAINT_JOINTLIMITMINMAXTABLECONSTRAINT_H
-#define IKCONSTRAINT_JOINTLIMITMINMAXTABLECONSTRAINT_H
+#ifndef AIK_CONSTRAINT_JOINTLIMITMINMAXTABLECONSTRAINT_H
+#define AIK_CONSTRAINT_JOINTLIMITMINMAXTABLECONSTRAINT_H
 
-#include <ik_constraint/JointLimitConstraint.h>
+#include <aik_constraint/JointLimitConstraint.h>
 #include <joint_limit_table/JointLimitTable.h>
 
-namespace ik_constraint_joint_limit_table{
-  class JointLimitMinMaxTableConstraint : public IK::JointLimitConstraint {
+namespace aik_constraint_joint_limit_table{
+  class JointLimitMinMaxTableConstraint : public aik_constraint::JointLimitConstraint {
   public:
     //jointのqをq_upperとq_lowerの間かつmin-max-tableの間にさせる.
 
     const std::vector<std::shared_ptr<joint_limit_table::JointLimitTable> >& jointLimitTables() const { return jointLimitTables_;}
     std::vector<std::shared_ptr<joint_limit_table::JointLimitTable> >& jointLimitTables() { return jointLimitTables_;}
 
-    virtual bool checkConvergence () override;
-
   protected:
+    double get_q_lower() override; // this->joint_はnullptrではない前提
+    double get_q_upper() override; // this->joint_はnullptrではない前提
+
     std::vector<std::shared_ptr<joint_limit_table::JointLimitTable> > jointLimitTables_;
   };
 }

@@ -9,6 +9,8 @@ namespace aik_constraint{
       this->minIneq_.resize(0);
       this->maxIneq_.resize(0);
       this->jacobianIneq_.resize(0,0);
+      this->jacobianIneq_joints_.resize(0);
+      this->jacobianIneq_joint_ = nullptr;
       return;
     }
 
