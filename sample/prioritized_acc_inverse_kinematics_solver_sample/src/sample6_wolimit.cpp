@@ -10,10 +10,11 @@
 #include <prioritized_qp_osqp/prioritized_qp_osqp.h>
 #include <aik_constraint/PositionConstraint.h>
 #include <aik_constraint/JointAngleConstraint.h>
+#include <aik_constraint/JointLimitConstraint.h>
 #include <aik_constraint/COMConstraint.h>
 
 namespace prioritized_acc_inverse_kinematics_solver_sample{
-  void sample5_com(){
+  void sample6_wolimit(){
     // setup robot
     cnoid::BodyLoader bodyLoader;
     cnoid::BodyPtr robot = bodyLoader.load(ros::package::getPath("choreonoid") + "/share/model/SR1/SR1.body");
@@ -49,6 +50,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
 
     // setup task
     std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints0;
+
     std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints1;
     {
       // task: rleg to target
@@ -83,8 +85,8 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       constraint->A_link() = robot->link("RARM_WRIST_R");
       constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.02);
       constraint->B_link() = nullptr;
-      constraint->B_localpos().translation() = cnoid::Vector3(1.6,-0.2,0.8);
-      constraint->B_localpos().linear() = cnoid::Matrix3(cnoid::AngleAxis(-1.5,cnoid::Vector3(0,1,0)));
+      constraint->B_localpos().translation() = cnoid::Vector3(0.6,-0.2,0.8);
+      constraint->B_localpos().linear() = cnoid::Matrix3(cnoid::AngleAxis(1.5,cnoid::Vector3(0,1,0)));
       constraints2.push_back(constraint);
     }
     {

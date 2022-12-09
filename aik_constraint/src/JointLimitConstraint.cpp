@@ -1,89 +1,69 @@
-#include <ik_constraint/JointLimitConstraint.h>
+#include <aik_constraint/JointLimitConstraint.h>
 #include <iostream>
 
-namespace IK{
-  bool JointLimitConstraint::checkConvergence () {
+namespace aik_constraint{
+  void JointLimitConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
     if(!this->joint_ || !(this->joint_->isRotationalJoint() || this->joint_->isPrismaticJoint())) {
-      if(this->minineq_.rows() != 1) this->minineq_ = Eigen::VectorXd::Zero(1);
-      if(this->maxineq_.rows() != 1) this->maxineq_ = Eigen::VectorXd::Zero(1);
-      return true;
+      this->eq_.resize(0);
+      this->jacobian_.resize(0,0);
+      this->minIneq_.resize(0);
+      this->maxIneq_.resize(0);
+      this->jacobianIneq_.resize(0,0);
+      return;
     }
 
-    double lower = this->joint_->q_lower() - this->joint_->q();
-    double upper = this->joint_->q_upper() - this->joint_->q();
+    double target_acc_lower = 0.0;
+    target_acc_lower += std::min(this->pgain_ * (this->joint_->q_lower() - this->joint_->q()), this->maxAccByPosError_);
+    target_acc_lower += std::min(this->dgain_ * ( - this->joint_->dq()), this->maxAccByVelError_);
+    target_acc_lower = std::min(target_acc_lower, this->maxAcc_);
 
-    if(this->minineq_.rows() != 1) this->minineq_ = Eigen::VectorXd(1);
-    this->minineq_[0] = std::min(lower, this->maxError_) * this->weight_;
-    if(this->maxineq_.rows() != 1) this->maxineq_ = Eigen::VectorXd(1);
-    this->maxineq_[0] = std::max(upper, -this->maxError_) * this->weight_;
+    double target_acc_upper = 0.0;
+    target_acc_upper += std::max(this->pgain_ * (this->joint_->q_upper() - this->joint_->q()), -this->maxAccByPosError_);
+    target_acc_upper += std::max(this->dgain_ * ( - this->joint_->dq()), -this->maxAccByVelError_);
+    target_acc_upper = std::max(target_acc_upper, -this->maxAcc_);
 
-    if(this->debuglevel_>=1){
-      std::cerr << "JointLimitConstraint" << std::endl;
-      std::cerr << "q" << std::endl;
-      std::cerr << this->joint_->q() << std::endl;
-      std::cerr << "q_upper" << std::endl;
-      std::cerr << this->joint_->q_upper() << std::endl;
-      std::cerr << "q_lower" << std::endl;
-      std::cerr << this->joint_->q_lower() << std::endl;
-    }
+    if(this->minIneq_.rows() != 1) this->minIneq_ = Eigen::VectorXd(1);
+    this->minIneq_[0] = target_acc_lower * this->weight_;
+    if(this->maxIneq_.rows() != 1) this->maxIneq_ = Eigen::VectorXd(1);
+    this->maxIneq_[0] = target_acc_upper * this->weight_;
 
-    return lower<this->precision_ && upper>-this->precision_;
-  }
 
-  const Eigen::SparseMatrix<double,Eigen::RowMajor>& JointLimitConstraint::calc_jacobianineq (const std::vector<cnoid::LinkPtr>& joints) {
-    if(!this->is_joints_same(joints,this->jacobianineq_joints_) ||
-       this->joint_ != this->jacobianineq_joint_){
-      this->jacobianineq_joints_ = joints;
-      this->jacobianineq_joint_ = this->joint_;
-      this->jacobianineqColMap_.clear();
+    // calc jacobian
+    if(!this->isJointsSame(joints,this->jacobianIneq_joints_) ||
+       this->joint_ != this->jacobianIneq_joint_){
+      this->jacobianIneq_joints_ = joints;
+      this->jacobianIneq_joint_ = this->joint_;
+      this->jacobianIneqColMap_.clear();
       int cols = 0;
-      for(size_t i=0; i < this->jacobianineq_joints_.size(); i++){
-        this->jacobianineqColMap_[this->jacobianineq_joints_[i]] = cols;
-        cols += this->getJointDOF(this->jacobianineq_joints_[i]);
+      for(size_t i=0; i < this->jacobianIneq_joints_.size(); i++){
+        this->jacobianIneqColMap_[this->jacobianIneq_joints_[i]] = cols;
+        cols += this->getJointDOF(this->jacobianIneq_joints_[i]);
       }
 
-      this->jacobianineq_ = Eigen::SparseMatrix<double,Eigen::RowMajor>(1,cols);
+      this->jacobianIneq_ = Eigen::SparseMatrix<double,Eigen::RowMajor>(1,cols);
 
-      if(this->jacobianineqColMap_.find(this->jacobianineq_joint_) != this->jacobianineqColMap_.end()){
-        if(this->jacobianineq_joint_->isRotationalJoint() || this->jacobianineq_joint_->isPrismaticJoint()){
-          this->jacobianineq_.insert(0,this->jacobianineqColMap_[this->jacobianineq_joint_]) = 1;
-        }
+      if(this->jacobianIneqColMap_.find(this->jacobianIneq_joint_) != this->jacobianIneqColMap_.end()){
+        this->jacobianIneq_.insert(0,this->jacobianIneqColMap_[this->jacobianIneq_joint_]) = 1;
       }
 
     }
 
-    if(this->jacobianineqColMap_.find(this->jacobianineq_joint_) != this->jacobianineqColMap_.end()){
-      if(this->jacobianineq_joint_->isRotationalJoint() || this->jacobianineq_joint_->isPrismaticJoint()){
-        this->jacobianineq_.coeffRef(0,this->jacobianineqColMap_[this->jacobianineq_joint_]) = this->weight_;
-      }
+    if(this->jacobianIneqColMap_.find(this->jacobianIneq_joint_) != this->jacobianIneqColMap_.end()){
+      this->jacobianIneq_.coeffRef(0,this->jacobianIneqColMap_[this->jacobianIneq_joint_]) = this->weight_;
     }
 
-    if(this->debuglevel_>=1){
+
+    if(this->debugLevel_>=1){
       std::cerr << "JointLimitConstraint" << std::endl;
-      std::cerr << "jacobianineq" << std::endl;
-      std::cerr << this->jacobianineq_ << std::endl;
-    }
-    return this->jacobianineq_;
-  }
-
-  const Eigen::VectorXd& JointLimitConstraint::calc_minineq () {
-    if(this->debuglevel_>=1){
-      std::cerr << "JointLimitConstraint" << std::endl;
-      std::cerr << "minineq" << std::endl;
-      std::cerr << this->minineq_ << std::endl;
+      std::cerr << "q_lower q q_upper dq" << std::endl;
+      std::cerr << this->joint_->q_lower() << " " << this->joint_->q() << " " << this->joint_->q_upper() << " " << this->joint_->dq() << std::endl;
+      std::cerr << "minineq maxineq" << std::endl;
+      std::cerr << this->minIneq_ << " " << this->maxIneq_ << std::endl;
+      std::cerr << "jacobianIneq" << std::endl;
+      std::cerr << this->jacobianIneq_ << std::endl;
     }
 
-    return this->minineq_;
-  }
-
-  const Eigen::VectorXd& JointLimitConstraint::calc_maxineq () {
-    if(this->debuglevel_>=1){
-      std::cerr << "JointLimitConstraint" << std::endl;
-      std::cerr << "maxineq" << std::endl;
-      std::cerr << this->maxineq_ << std::endl;
-    }
-
-    return this->maxineq_;
+    return;
   }
 
 }

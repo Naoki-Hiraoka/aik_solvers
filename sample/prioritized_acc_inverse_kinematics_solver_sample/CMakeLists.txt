@@ -48,6 +48,8 @@ add_library(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin SHARED
   src/sample3_4limb_angle.cpp
   src/sample4_4limb_move.cpp
   src/sample5_com.cpp
+  src/sample6_wolimit.cpp
+  src/sample7_limit.cpp
 )
 target_link_libraries(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin
   ${catkin_LIBRARIES}

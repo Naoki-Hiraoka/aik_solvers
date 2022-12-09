@@ -3,7 +3,14 @@
 
 namespace aik_constraint{
   void JointAngleConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
-    if(!this->joint_) return;
+    if(!this->joint_ || !(this->joint_->isRotationalJoint() || this->joint_->isPrismaticJoint())) {
+      this->eq_.resize(0);
+      this->jacobian_.resize(0,0);
+      this->minIneq_.resize(0);
+      this->maxIneq_.resize(0);
+      this->jacobianIneq_.resize(0,0);
+      return;
+    }
 
     double target_acc = 0.0;
     target_acc += this->ref_acc_;
@@ -28,17 +35,13 @@ namespace aik_constraint{
       this->jacobian_ = Eigen::SparseMatrix<double,Eigen::RowMajor>(1,cols);
 
       if(this->jacobianColMap_.find(this->jacobian_joint_) != this->jacobianColMap_.end()){
-        if(this->jacobian_joint_->isRotationalJoint() || this->jacobian_joint_->isPrismaticJoint()){
-          this->jacobian_.insert(0,this->jacobianColMap_[this->jacobian_joint_]) = 1;
-        }
+        this->jacobian_.insert(0,this->jacobianColMap_[this->jacobian_joint_]) = 1;
       }
 
     }
 
     if(this->jacobianColMap_.find(this->jacobian_joint_) != this->jacobianColMap_.end()){
-      if(this->jacobian_joint_->isRotationalJoint() || this->jacobian_joint_->isPrismaticJoint()){
-        this->jacobian_.coeffRef(0,this->jacobianColMap_[this->jacobian_joint_]) = this->weight_;
-      }
+      this->jacobian_.coeffRef(0,this->jacobianColMap_[this->jacobian_joint_]) = this->weight_;
     }
 
 

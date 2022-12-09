@@ -1,10 +1,10 @@
-#ifndef IKCONSTRAINT_JOINTLIMITCONSTRAINT_H
-#define IKCONSTRAINT_JOINTLIMITCONSTRAINT_H
+#ifndef AIK_CONSTRAINT_JOINTLIMITCONSTRAINT_H
+#define AIK_CONSTRAINT_JOINTLIMITCONSTRAINT_H
 
-#include <ik_constraint/IKConstraint.h>
+#include <aik_constraint/IKConstraint.h>
 #include <cnoid/EigenUtil>
 
-namespace IK{
+namespace aik_constraint{
   class JointLimitConstraint : public IKConstraint
   {
   public:
@@ -15,25 +15,33 @@ namespace IK{
 
     const cnoid::LinkPtr& joint() const { return joint_;}
     cnoid::LinkPtr& joint() { return joint_;}
-    const double& maxError() const { return maxError_;}
-    double& maxError() { return maxError_;}
-    const double& precision() const { return precision_;}
-    double& precision() { return precision_;}
+    const double& pgain() const { return pgain_;}
+    double& pgain() { return pgain_;}
+    const double& dgain() const { return dgain_;}
+    double& dgain() { return dgain_;}
+    const double& maxAcc() const { return maxAcc_;}
+    double& maxAcc() { return maxAcc_;}
+    const double& maxAccByPosError() const { return maxAccByPosError_;}
+    double& maxAccByPosError() { return maxAccByPosError_;}
+    const double& maxAccByVelError() const { return maxAccByVelError_;}
+    double& maxAccByVelError() { return maxAccByVelError_;}
     const double& weight() const { return weight_;}
     double& weight() { return weight_;}
 
-    virtual bool checkConvergence () override;
-    virtual const Eigen::SparseMatrix<double,Eigen::RowMajor>& calc_jacobianineq (const std::vector<cnoid::LinkPtr>& joints) override;
-    virtual const Eigen::VectorXd& calc_minineq () override;
-    virtual const Eigen::VectorXd& calc_maxineq () override;
+    void update (const std::vector<cnoid::LinkPtr>& joints) override;
 
   protected:
     cnoid::LinkPtr joint_ = nullptr;
-    double precision_ = 1e10;
-    double maxError_ = 1e-2;
+    double pgain_ = 400;
+    double dgain_ = 50;
+    double maxAcc_ = 15;
+    double maxAccByPosError_ = 5;
+    double maxAccByVelError_ = 10;
     double weight_ = 1.0;
 
-    cnoid::LinkPtr jacobianineq_joint_ = nullptr; //前回jacobian_を計算した時のjoint
+    cnoid::LinkPtr jacobianIneq_joint_ = nullptr; //前回jacobian_を計算した時のjoint
+    std::vector<cnoid::LinkPtr> jacobianIneq_joints_; // 前回のjacobian計算時のjoints
+    std::unordered_map<cnoid::LinkPtr,int> jacobianIneqColMap_;
   };
 }
 

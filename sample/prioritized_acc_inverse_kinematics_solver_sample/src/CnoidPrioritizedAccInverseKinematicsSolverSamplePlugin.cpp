@@ -49,6 +49,24 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
   };
   typedef cnoid::ref_ptr<sample5_comItem> sample5_comItemPtr;
 
+  void sample6_wolimit();
+  class sample6_wolimitItem : public choreonoid_viewer::ViewerBaseItem {
+  public:
+    static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample6_wolimitItem>("sample6_wolimitItem"); }
+  protected:
+    virtual void main() override{ sample6_wolimit(); return; }
+  };
+  typedef cnoid::ref_ptr<sample6_wolimitItem> sample6_wolimitItemPtr;
+
+  void sample7_limit();
+  class sample7_limitItem : public choreonoid_viewer::ViewerBaseItem {
+  public:
+    static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample7_limitItem>("sample7_limitItem"); }
+  protected:
+    virtual void main() override{ sample7_limit(); return; }
+  };
+  typedef cnoid::ref_ptr<sample7_limitItem> sample7_limitItemPtr;
+
 
   class PrioritizedAccInverseKinematicsSolverSamplePlugin : public cnoid::Plugin
   {
@@ -65,6 +83,8 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       sample3_4limb_angleItem::initializeClass(this);
       sample4_4limb_moveItem::initializeClass(this);
       sample5_comItem::initializeClass(this);
+      sample6_wolimitItem::initializeClass(this);
+      sample7_limitItem::initializeClass(this);
       return true;
     }
   };

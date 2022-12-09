@@ -112,7 +112,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     for(size_t i=0;i<robot->numJoints();i++){
       variables.push_back(robot->joint(i));
     }
-    std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > > constraints{constraints0,constraints1,constraints2,constraints2};
+    std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > > constraints{constraints0,constraints1,constraints2};
     for(size_t i=0;i<constraints.size();i++){
       for(size_t j=0;j<constraints[i].size();j++){
         constraints[i][j]->debugLevel() = debugLevel;//debug
