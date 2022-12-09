@@ -55,6 +55,8 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       for(int i=0;i<robot->numJoints();i++){
         std::shared_ptr<aik_constraint::JointLimitConstraint> constraint = std::make_shared<aik_constraint::JointLimitConstraint>();
         constraint->joint() = robot->joint(i);
+        constraint->dgain() = 100;
+        constraint->maxAccByVelError() = 20;
         constraints0.push_back(constraint);
       }
     }

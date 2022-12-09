@@ -99,7 +99,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
         std::shared_ptr<aik_constraint::JointAngleConstraint> constraint = std::make_shared<aik_constraint::JointAngleConstraint>();
         constraint->joint() = robot->joint(i);
         constraint->targetq() = reset_manip_pose[i];
-        constraint->weight() = 0.1;
+        constraint->weight() = 0.3;
         constraints2.push_back(constraint);
       }
     }

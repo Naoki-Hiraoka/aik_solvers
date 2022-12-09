@@ -29,7 +29,7 @@ namespace aik_constraint_vclip{
                                                     B_localp
                                                     );
 
-    if(solved && distance > 1e-6){
+    if(solved && dist > 1e-6){
       distance = dist;
       direction = (A_link->T()*A_localp - B_link->T()*B_localp).normalized();
       A_v = A_localp;
