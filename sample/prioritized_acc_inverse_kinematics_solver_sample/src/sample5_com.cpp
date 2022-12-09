@@ -9,9 +9,11 @@
 #include <prioritized_acc_inverse_kinematics_solver/PrioritizedAccInverseKinematicsSolver.h>
 #include <prioritized_qp_osqp/prioritized_qp_osqp.h>
 #include <aik_constraint/PositionConstraint.h>
+#include <aik_constraint/JointAngleConstraint.h>
+#include <aik_constraint/COMConstraint.h>
 
 namespace prioritized_acc_inverse_kinematics_solver_sample{
-  void sample1_4limb(){
+  void sample5_com(){
     // setup robot
     cnoid::BodyLoader bodyLoader;
     cnoid::BodyPtr robot = bodyLoader.load(ros::package::getPath("choreonoid") + "/share/model/SR1/SR1.body");
@@ -39,6 +41,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     robot->calcCenterOfMass();
     robot->rootLink()->F_ext() = cnoid::calcInverseDynamics(robot->rootLink());
 
+
     // setup viewer
     choreonoid_viewer::Viewer viewer;
     viewer.objects(robot);
@@ -65,15 +68,22 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       constraint->B_localpos().translation() = cnoid::Vector3(0.0,0.2,0.0);
       constraints1.push_back(constraint);
     }
+    {
+      // task: COM to target
+      std::shared_ptr<aik_constraint::COMConstraint> constraint = std::make_shared<aik_constraint::COMConstraint>();
+      constraint->A_robot() = robot;
+      constraint->B_localp() = cnoid::Vector3(0.0,0.0,0.7);
+      constraints1.push_back(constraint);
+    }
 
     std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints2;
     {
-      // task: rarm to target.
+      // task: rarm to target. never reach
       std::shared_ptr<aik_constraint::PositionConstraint> constraint = std::make_shared<aik_constraint::PositionConstraint>();
       constraint->A_link() = robot->link("RARM_WRIST_R");
       constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.02);
       constraint->B_link() = nullptr;
-      constraint->B_localpos().translation() = cnoid::Vector3(0.6,-0.2,0.8);
+      constraint->B_localpos().translation() = cnoid::Vector3(1.6,-0.2,0.8);
       constraint->B_localpos().linear() = cnoid::Matrix3(cnoid::AngleAxis(-1.5,cnoid::Vector3(0,1,0)));
       constraints2.push_back(constraint);
     }
@@ -83,11 +93,23 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       constraint->A_link() = robot->link("LARM_WRIST_R");
       constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.02);
       constraint->B_link() = nullptr;
-      constraint->B_localpos().translation() = cnoid::Vector3(0.3,0.2,0.8);
+      constraint->B_localpos().translation() = cnoid::Vector3(0.0,0.2,0.8);
       constraint->B_localpos().linear() = cnoid::Matrix3(cnoid::AngleAxis(-1.5,cnoid::Vector3(0,1,0)));
       for(size_t i=0;i<3;i++)constraint->weight()[3+i] = 0.0;
       constraints2.push_back(constraint);
     }
+
+    {
+      // task: joint angle to target
+      for(int i=0;i<robot->numJoints();i++){
+        std::shared_ptr<aik_constraint::JointAngleConstraint> constraint = std::make_shared<aik_constraint::JointAngleConstraint>();
+        constraint->joint() = robot->joint(i);
+        constraint->targetq() = reset_manip_pose[i];
+        constraint->weight() = 0.1;
+        constraints2.push_back(constraint);
+      }
+    }
+
 
     int debugLevel = 0; // 0 or 1
     std::vector<std::shared_ptr<prioritized_qp_base::Task> > tasks;
@@ -96,7 +118,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     for(size_t i=0;i<robot->numJoints();i++){
       variables.push_back(robot->joint(i));
     }
-    std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > > constraints{constraints0,constraints1,constraints2};
+    std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > > constraints{constraints0,constraints1,constraints2,constraints2};
     for(size_t i=0;i<constraints.size();i++){
       for(size_t j=0;j<constraints[i].size();j++){
         constraints[i][j]->debugLevel() = debugLevel;//debug

@@ -10,10 +10,6 @@ namespace aik_constraint{
   class COMConstraint : public IKConstraint
   {
   public:
-    COMConstraint()
-      :
-      C_(Eigen::SparseMatrix<double,Eigen::RowMajor>(0,3)) // 下の定義の箇所で初期化するとUbuntu16でエラーになった
-    {}
     //robotの重心をworld座標系のtargetPosに位置させる.
     //  maxError: エラーの頭打ち
     //  precision: 収束判定の閾値
@@ -34,22 +30,22 @@ namespace aik_constraint{
     const cnoid::Matrix3d& eval_R() const { return eval_R_;}
     cnoid::Matrix3d& eval_R() { return eval_R_;}
 
-    const cnoid::Vector6& ref_acc() const { return ref_acc_;}
-    cnoid::Vector6& ref_acc() { return ref_acc_;}
-    const cnoid::Vector6& pgain() const { return pgain_;}
-    cnoid::Vector6& pgain() { return pgain_;}
-    const cnoid::Vector6& dgain() const { return dgain_;}
-    cnoid::Vector6& dgain() { return dgain_;}
-    const cnoid::Vector6& maxAcc() const { return maxAcc_;}
-    cnoid::Vector6& maxAcc() { return maxAcc_;}
-    const cnoid::Vector6& maxAccByPosError() const { return maxAccByPosError_;}
-    cnoid::Vector6& maxAccByPosError() { return maxAccByPosError_;}
-    const cnoid::Vector6& maxAccByVelError() const { return maxAccByVelError_;}
-    cnoid::Vector6& maxAccByVelError() { return maxAccByVelError_;}
+    const cnoid::Vector3& ref_acc() const { return ref_acc_;}
+    cnoid::Vector3& ref_acc() { return ref_acc_;}
+    const cnoid::Vector3& pgain() const { return pgain_;}
+    cnoid::Vector3& pgain() { return pgain_;}
+    const cnoid::Vector3& dgain() const { return dgain_;}
+    cnoid::Vector3& dgain() { return dgain_;}
+    const cnoid::Vector3& maxAcc() const { return maxAcc_;}
+    cnoid::Vector3& maxAcc() { return maxAcc_;}
+    const cnoid::Vector3& maxAccByPosError() const { return maxAccByPosError_;}
+    cnoid::Vector3& maxAccByPosError() { return maxAccByPosError_;}
+    const cnoid::Vector3& maxAccByVelError() const { return maxAccByVelError_;}
+    cnoid::Vector3& maxAccByVelError() { return maxAccByVelError_;}
     const cnoid::Vector3& weight() const { return weight_;}
     cnoid::Vector3& weight() { return weight_;}
 
-    void update () override;
+    void update (const std::vector<cnoid::LinkPtr>& joints) override;
 
   protected:
     cnoid::BodyPtr A_robot_ = nullptr;
@@ -57,7 +53,7 @@ namespace aik_constraint{
     cnoid::Vector3 A_localv_ = cnoid::Vector3::Zero();
     cnoid::BodyPtr B_robot_ = nullptr;
     cnoid::Vector3 B_localp_ = cnoid::Vector3::Zero();
-    cnoid::Vector3 B_localp_ = cnoid::Vector3::Zero();
+    cnoid::Vector3 B_localv_ = cnoid::Vector3::Zero();
     cnoid::Matrix3d eval_R_ = cnoid::Matrix3d::Identity();
 
     cnoid::Vector3 ref_acc_ = cnoid::Vector3::Zero();

@@ -47,6 +47,7 @@ add_library(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin SHARED
   src/sample2_4limb_unsolvable.cpp
   src/sample3_4limb_angle.cpp
   src/sample4_4limb_move.cpp
+  src/sample5_com.cpp
 )
 target_link_libraries(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin
   ${catkin_LIBRARIES}

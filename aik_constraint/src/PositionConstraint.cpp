@@ -51,15 +51,15 @@ namespace aik_constraint{
     cnoid::Vector6 vel_error_eval; // eval frame. A - B
     vel_error_eval.head<3>() = (eval_R.transpose() * vel_error.head<3>()).eval();
     vel_error_eval.tail<3>() = (eval_R.transpose() * vel_error.tail<3>()).eval();
-    cnoid::Vector6 target_acc = cnoid::Vector6::Zero();
+    cnoid::Vector6 target_acc = cnoid::Vector6::Zero(); // eval frame. A - B
     target_acc += this->ref_acc_;
-    target_acc += this->clamp(cnoid::Vector6(this->pgain_.cwiseProduct(pos_error_eval)), this->maxAccByPosError_);
-    target_acc += this->clamp(cnoid::Vector6(this->dgain_.cwiseProduct(vel_error_eval)), this->maxAccByVelError_);
-    target_acc += - (B_acc - A_acc); // eval frame. B - A
+    target_acc -= this->clamp(cnoid::Vector6(this->pgain_.cwiseProduct(pos_error_eval)), this->maxAccByPosError_);
+    target_acc -= this->clamp(cnoid::Vector6(this->dgain_.cwiseProduct(vel_error_eval)), this->maxAccByVelError_);
+    target_acc -= A_acc - B_acc;
     target_acc = this->clamp(target_acc, this->maxAcc_);
 
     {
-      // B-Aの目標加速度を計算し、this->eq_に入れる
+      // A-Bの目標加速度を計算し、this->eq_に入れる
       if(this->eq_.rows()!=(this->weight_.array() > 0.0).count()) this->eq_ = Eigen::VectorXd((this->weight_.array() > 0.0).count());
       for(size_t i=0, idx=0; i<6; i++){
         if(this->weight_[i]>0.0) {
@@ -115,7 +115,7 @@ namespace aik_constraint{
       this->jacobian_.resize((this->weight_.array() > 0.0).count(),this->jacobian_full_local_.cols());
       for(size_t i=0, idx=0;i<6;i++){
         if(this->weight_[i]>0.0) {
-          this->jacobian_.row(idx) = - this->weight_[i] * this->jacobian_full_local_.row(i); // マイナス: A-B をB-Aに変換
+          this->jacobian_.row(idx) = this->weight_[i] * this->jacobian_full_local_.row(i);
           idx++;
         }
       }

@@ -51,6 +51,8 @@ namespace aik_constraint {
   void calcCMJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
                           const cnoid::BodyPtr& A_robot,//input
                           const cnoid::BodyPtr& B_robot,//input
+                          const Eigen::MatrixXd& A_CMJ, //[joint root]の順 input
+                          const Eigen::MatrixXd& B_CMJ, //[joint root]の順 input
                           std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
                           Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
                           );

@@ -2,13 +2,9 @@
 #include <cnoid/ItemManager>
 
 #include <choreonoid_viewer/choreonoid_viewer.h>
-#include "sample1_4limb.h"
-#include "sample2_4limb_unsolvable.h"
-#include "sample3_4limb_angle.h"
-#include "sample4_4limb_move.h"
 
 namespace prioritized_acc_inverse_kinematics_solver_sample{
-
+  void sample1_4limb();
   class sample1_4limbItem : public choreonoid_viewer::ViewerBaseItem {
   public:
     static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample1_4limbItem>("sample1_4limbItem"); }
@@ -17,6 +13,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
   };
   typedef cnoid::ref_ptr<sample1_4limbItem> sample1_4limbItemPtr;
 
+  void sample2_4limb_unsolvable();
   class sample2_4limb_unsolvableItem : public choreonoid_viewer::ViewerBaseItem {
   public:
     static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample2_4limb_unsolvableItem>("sample2_4limb_unsolvableItem"); }
@@ -25,6 +22,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
   };
   typedef cnoid::ref_ptr<sample2_4limb_unsolvableItem> sample2_4limb_unsolvableItemPtr;
 
+  void sample3_4limb_angle();
   class sample3_4limb_angleItem : public choreonoid_viewer::ViewerBaseItem {
   public:
     static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample3_4limb_angleItem>("sample3_4limb_angleItem"); }
@@ -33,6 +31,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
   };
   typedef cnoid::ref_ptr<sample3_4limb_angleItem> sample3_4limb_angleItemPtr;
 
+  void sample4_4limb_move();
   class sample4_4limb_moveItem : public choreonoid_viewer::ViewerBaseItem {
   public:
     static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample4_4limb_moveItem>("sample4_4limb_moveItem"); }
@@ -40,6 +39,15 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     virtual void main() override{ sample4_4limb_move(); return; }
   };
   typedef cnoid::ref_ptr<sample4_4limb_moveItem> sample4_4limb_moveItemPtr;
+
+  void sample5_com();
+  class sample5_comItem : public choreonoid_viewer::ViewerBaseItem {
+  public:
+    static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample5_comItem>("sample5_comItem"); }
+  protected:
+    virtual void main() override{ sample5_com(); return; }
+  };
+  typedef cnoid::ref_ptr<sample5_comItem> sample5_comItemPtr;
 
 
   class PrioritizedAccInverseKinematicsSolverSamplePlugin : public cnoid::Plugin
@@ -56,6 +64,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       sample2_4limb_unsolvableItem::initializeClass(this);
       sample3_4limb_angleItem::initializeClass(this);
       sample4_4limb_moveItem::initializeClass(this);
+      sample5_comItem::initializeClass(this);
       return true;
     }
   };

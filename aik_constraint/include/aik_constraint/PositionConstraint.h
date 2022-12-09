@@ -13,7 +13,7 @@ namespace aik_constraint{
     //A_link中のA_localposの部位とB_link中のB_localposの部位を一致させる.
     //  pgain: evel座標系
     //  dgain: evel座標系
-    //  ref_acc: eval_frame. feedforward目標加速度(B-A). ref_acc + pgain * error + dgain * derrorが目標加速度になる
+    //  ref_acc: eval_frame. feedforward目標加速度(A-B). ref_acc + pgain * error + dgain * derrorが目標加速度になる
     //  maxAcc: 目標加速度の頭打ち eval座標系. 目標加速度をmaxAccで頭打ちしてからweight倍したものがgetEq()で返る
     //  maxAccByPosError: 目標加速度の頭打ち eval座標系.
     //  maxAccByVelError: 目標加速度の頭打ち eval座標系.

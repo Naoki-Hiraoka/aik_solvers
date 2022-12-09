@@ -260,6 +260,8 @@ namespace aik_constraint {
   void calcCMJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
                           const cnoid::BodyPtr& A_robot,//input
                           const cnoid::BodyPtr& B_robot,//input
+                          const Eigen::MatrixXd& A_CMJ, //[joint root]の順 input
+                          const Eigen::MatrixXd& B_CMJ, //[joint root]の順 input
                           std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
                           Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
                           ) {
@@ -269,8 +271,7 @@ namespace aik_constraint {
         if(!robot) continue;
         int sign = (i==0) ? 1 : -1;
 
-        Eigen::MatrixXd CMJ;
-        cnoid::calcCMJacobian(robot,nullptr,CMJ); // [joint root]の順
+        const Eigen::MatrixXd& CMJ = (i==0) ? A_CMJ : B_CMJ; // [joint root]の順
 
         if(jacobianColMap.find(robot->rootLink()) != jacobianColMap.end()){
           int col_idx = jacobianColMap[robot->rootLink()];
