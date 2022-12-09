@@ -1,9 +1,9 @@
-#ifndef IK_CONSTRAINT_COLLISIONCONSTRAINT_H
-#define IK_CONSTRAINT_COLLISIONCONSTRAINT_H
+#ifndef AIK_CONSTRAINT_COLLISIONCONSTRAINT_H
+#define AIK_CONSTRAINT_COLLISIONCONSTRAINT_H
 
-#include <ik_constraint/IKConstraint.h>
+#include <aik_constraint/IKConstraint.h>
 
-namespace IK{
+namespace aik_constraint{
   class CollisionConstraint : public IKConstraint
   {
   public:
@@ -23,19 +23,23 @@ namespace IK{
     cnoid::LinkPtr& B_link() { return B_link_;}
     const double& tolerance() const { return tolerance_;}
     double& tolerance() { return tolerance_;}
-    const double& maxError() const { return maxError_;}
-    double& maxError() { return maxError_;}
-    const double& precision() const { return precision_;}
-    double& precision() { return precision_;}
+    const double& pgain() const { return pgain_;}
+    double& pgain() { return pgain_;}
+    const double& dgain() const { return dgain_;}
+    double& dgain() { return dgain_;}
+    const double& maxAcc() const { return maxAcc_;}
+    double& maxAcc() { return maxAcc_;}
+    const double& maxAccByPosError() const { return maxAccByPosError_;}
+    double& maxAccByPosError() { return maxAccByPosError_;}
+    const double& maxAccByVelError() const { return maxAccByVelError_;}
+    double& maxAccByVelError() { return maxAccByVelError_;}
     const double& weight() const { return weight_;}
     double& weight() { return weight_;}
-    const double& velocityDamper() const { return velocityDamper_;}
-    double& velocityDamper() { return velocityDamper_;}
 
-    bool checkConvergence () override;
-    const Eigen::SparseMatrix<double,Eigen::RowMajor>& calc_jacobianineq (const std::vector<cnoid::LinkPtr>& joints) override;
-    const Eigen::VectorXd& calc_minineq () override;
-    const Eigen::VectorXd& calc_maxineq () override;
+    void update (const std::vector<cnoid::LinkPtr>& joints) override;
+
+    // for debug view
+    const std::vector<cnoid::SgNodePtr>& getDrawOnObjects() override;
 
   protected:
     //A_v, B_vはlocal系
@@ -45,22 +49,29 @@ namespace IK{
     cnoid::LinkPtr A_link_ = nullptr;
     cnoid::LinkPtr B_link_ = nullptr;
     double tolerance_ = 0.01;
-    double maxError_ = 0.1;
-    double precision_ = 1e-4;
+    double pgain_ = 400;
+    double dgain_ = 50;
+    double maxAcc_ = 15;
+    double maxAccByPosError_ = 5;
+    double maxAccByVelError_ = 10;
     double weight_ = 1.0;
-    double velocityDamper_ = 1.0;
+
+    cnoid::SgLineSetPtr lines_;
 
     cnoid::Vector3 A_currentLocalp_ = cnoid::Vector3::Zero();
     cnoid::Vector3 B_currentLocalp_ = cnoid::Vector3::Zero();
-    cnoid::Vector3 currentDirection_ = cnoid::Vector3::UnitX();
+    cnoid::Vector3 currentDirection_ = cnoid::Vector3::UnitX(); // B->A
 
     std::vector<cnoid::LinkPtr> path_A_joints_;
     std::vector<cnoid::LinkPtr> path_B_joints_;
     std::vector<cnoid::LinkPtr> path_BA_joints_;
     int path_BA_joints_numUpwardConnections_ = 0;
-    cnoid::LinkPtr jacobianineq_A_link_ = nullptr;// 前回のjacobian計算時のA_link
-    cnoid::LinkPtr jacobianineq_B_link_ = nullptr;// 前回のjacobian計算時のB_link
-    Eigen::SparseMatrix<double,Eigen::RowMajor> jacobianineq_full_;
+    cnoid::LinkPtr jacobianIneq_A_link_ = nullptr;// 前回のjacobian計算時のA_link
+    cnoid::LinkPtr jacobianIneq_B_link_ = nullptr;// 前回のjacobian計算時のB_link
+    Eigen::SparseMatrix<double,Eigen::RowMajor> jacobianIneq_full_;
+    std::vector<cnoid::LinkPtr> jacobianIneq_joints_; // 前回のjacobian計算時のjoints
+    std::unordered_map<cnoid::LinkPtr,int> jacobianIneqColMap_;
+
   };
 
 

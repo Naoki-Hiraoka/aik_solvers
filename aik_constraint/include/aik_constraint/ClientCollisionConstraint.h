@@ -1,13 +1,12 @@
-#ifndef IK_CONSTRAINT_CLIENTCOLLISIONCONSTRAINT_H
-#define IK_CONSTRAINT_CLIENTCOLLISIONCONSTRAINT_H
+#ifndef AIK_CONSTRAINT_CLIENTCOLLISIONCONSTRAINT_H
+#define AIK_CONSTRAINT_CLIENTCOLLISIONCONSTRAINT_H
 
-#include <ik_constraint/CollisionConstraint.h>
+#include <aik_constraint/CollisionConstraint.h>
 
-namespace IK{
+namespace aik_constraint{
   class ClientCollisionConstraint : public CollisionConstraint
   {
   public:
-    ClientCollisionConstraint();
 
     // A_linkとB_linkの干渉を回避する
     //  最近傍点と、方向ベクトルはgiven. 距離のみ計算
