@@ -56,6 +56,15 @@ namespace prioritized_acc_inverse_kinematics_solver {
 
         num_eqs += eqs[j].get().rows();
         num_ineqs += minineqs[j].get().rows();
+
+        if((eqs[j].get().rows() != jacobians[j].get().rows()) ||
+           (jacobians[j].get().rows() > 0 && dim != jacobians[j].get().cols()) ||
+           (minineqs[j].get().rows() != jacobianineqs[j].get().rows()) ||
+           (maxineqs[j].get().rows() != jacobianineqs[j].get().rows()) ||
+           (jacobianineqs[j].get().rows() > 0 && dim != jacobianineqs[j].get().cols())){
+          std::cerr << "[prioritized_acc_inverse_kinematics_solver::solveAIK] dimension mismatch" << std::endl;
+          return false;
+        }
       }
 
       prevTasks[i]->A().resize(num_eqs, dim);

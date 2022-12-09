@@ -44,7 +44,7 @@ namespace aik_constraint{
     target_Idw_eval_scaled += Idw_error_eval_scaled;
     target_Idw_eval_scaled = this->clamp(target_Idw_eval_scaled, this->maxAcc_);
 
-    if(this->eq_.rows() != 3) this->eq_ = Eigen::VectorXd(3);
+    this->eq_.resize((this->weight_.array() > 0.0).count());
     for(size_t i=0, idx=0; i<3; i++){
       if(this->weight_[i]>0.0) {
         this->eq_[idx] = target_Idw_eval_scaled[i] * this->weight_[i];

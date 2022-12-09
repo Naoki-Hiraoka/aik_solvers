@@ -99,7 +99,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
         std::shared_ptr<aik_constraint::JointAngleConstraint> constraint = std::make_shared<aik_constraint::JointAngleConstraint>();
         constraint->joint() = robot->joint(i);
         constraint->targetq() = reset_manip_pose[i];
-        constraint->weight() = 0.3;
+        constraint->weight() = 0.03;
         constraints2.push_back(constraint);
       }
     }
@@ -125,11 +125,12 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     for(int i=0;i< 300 / dt;i++){
 
       // move goal
-      rarmConstraint->B_localpos().translation() = cnoid::Vector3(0.7+0.3*std::sin(i*dt),-0.2,0.8);
-      rarmConstraint->B_localvel().head<3>() = cnoid::Vector3(0.3*std::cos(i*dt),0,0);
+      rarmConstraint->B_localpos().translation() = cnoid::Vector3(1.0+0.6*std::sin(i*dt),-0.2,0.8);
+      rarmConstraint->B_localvel().head<3>() = cnoid::Vector3(0.6*std::cos(i*dt),0,0);
 
       prioritized_acc_inverse_kinematics_solver::IKParam param;
       param.debugLevel = debugLevel;
+      param.wn = 1e-6;
       bool solved = prioritized_acc_inverse_kinematics_solver::solveAIK(variables,
                                                                         constraints,
                                                                         tasks,

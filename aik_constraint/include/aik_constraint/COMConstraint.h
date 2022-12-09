@@ -47,6 +47,9 @@ namespace aik_constraint{
 
     void update (const std::vector<cnoid::LinkPtr>& joints) override;
 
+    // for debug view
+    const std::vector<cnoid::SgNodePtr>& getDrawOnObjects() override;
+
   protected:
     cnoid::BodyPtr A_robot_ = nullptr;
     cnoid::Vector3 A_localp_ = cnoid::Vector3::Zero();
@@ -63,6 +66,8 @@ namespace aik_constraint{
     cnoid::Vector3 maxAccByPosError_ = 5 * cnoid::Vector3::Ones();
     cnoid::Vector3 maxAccByVelError_ = 10 * cnoid::Vector3::Ones();
     cnoid::Vector3 weight_ = cnoid::Vector3::Ones();
+
+    cnoid::SgLineSetPtr lines_;
 
     cnoid::BodyPtr jacobian_A_robot_ = nullptr;// 前回のjacobian計算時のrobot
     cnoid::BodyPtr jacobian_B_robot_ = nullptr;// 前回のjacobian計算時のrobot
