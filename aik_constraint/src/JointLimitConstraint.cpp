@@ -24,6 +24,12 @@ namespace aik_constraint{
     target_acc_upper += std::max(this->dgain_ * ( - this->joint_->dq()), -this->maxAccByVelError_);
     target_acc_upper = std::max(target_acc_upper, -this->maxAcc_);
 
+    if(target_acc_upper <  target_acc_lower){ // 念の為
+      double average = (target_acc_upper + target_acc_lower) / 2;
+      target_acc_upper = average;
+      target_acc_lower = average;
+    }
+
     if(this->minIneq_.rows() != 1) this->minIneq_ = Eigen::VectorXd(1);
     this->minIneq_[0] = target_acc_lower * this->weight_;
     if(this->maxIneq_.rows() != 1) this->maxIneq_ = Eigen::VectorXd(1);
