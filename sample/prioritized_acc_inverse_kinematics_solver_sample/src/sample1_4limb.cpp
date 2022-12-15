@@ -37,7 +37,9 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     for(int l=0;l<robot->numLinks();l++) robot->link(l)->F_ext().setZero();
     robot->calcForwardKinematics(true,true);
     robot->calcCenterOfMass();
-    robot->rootLink()->F_ext() = cnoid::calcInverseDynamics(robot->rootLink());
+    cnoid::Vector6 F_o = cnoid::calcInverseDynamics(robot->rootLink()); // world frame origin
+    robot->rootLink()->F_ext().head<3>() = F_o.head<3>(); // rootLink origin
+    robot->rootLink()->F_ext().tail<3>() = F_o.tail<3>() + (-robot->rootLink()->p()).cross(F_o.head<3>()); // rootLink origin
 
     // setup viewer
     choreonoid_viewer::Viewer viewer;
@@ -145,7 +147,9 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       for(int l=0;l<robot->numLinks();l++) robot->link(l)->F_ext().setZero();
       robot->calcForwardKinematics(true, true);
       robot->calcCenterOfMass();
-      robot->rootLink()->F_ext() = cnoid::calcInverseDynamics(robot->rootLink());
+      cnoid::Vector6 F_o = cnoid::calcInverseDynamics(robot->rootLink()); // world frame origin
+      robot->rootLink()->F_ext().head<3>() = F_o.head<3>(); // rootLink origin
+      robot->rootLink()->F_ext().tail<3>() = F_o.tail<3>() + (-robot->rootLink()->p()).cross(F_o.head<3>()); // rootLink origin
 
       // sleep
       //std::this_thread::sleep_for(std::chrono::milliseconds(int(dt * 1000 / 2)));

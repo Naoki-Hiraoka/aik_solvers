@@ -11,7 +11,7 @@ namespace aik_constraint{
   {
   public:
 
-    // 必ず,状態更新(全リンクのF_extは0. 探索変数のリンクのddqは0) -> ForwardKinematics(true,true) -> calcCenterOfMass() -> calcInverseDynamics()してrootLinkが受ける力をrootLink->F_ext()に入れる -> update() -> getError() / getJacobian / getMin/MaxIneq / getJacobianIneq / getDrawOnObjects の順で呼ぶので、同じ処理を何度も行うのではなく最初に呼ばれる関数で1回だけ行って以降はキャッシュを使ってよい
+    // 必ず,状態更新(全リンクのF_extは0. 探索変数のリンクのddqは0) -> ForwardKinematics(true,true) -> calcCenterOfMass() -> calcInverseDynamics()してrootLinkが受ける力(rootLinkまわり)をrootLink->F_ext()に入れる -> update() -> getError() / getJacobian / getMin/MaxIneq / getJacobianIneq / getDrawOnObjects の順で呼ぶので、同じ処理を何度も行うのではなく最初に呼ばれる関数で1回だけ行って以降はキャッシュを使ってよい
 
     // 内部状態更新
     virtual void update (const std::vector<cnoid::LinkPtr>& joints) { return; }

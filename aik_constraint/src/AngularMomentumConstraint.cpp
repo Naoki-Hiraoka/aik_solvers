@@ -28,6 +28,7 @@ namespace aik_constraint{
       dq.tail<3>() = this->robot_->rootLink()->w();
       Iw = AMJ * dq;
     }
+
     cnoid::Vector3 Idw = this->robot_->rootLink()->F_ext().tail<3>() + (this->robot_->rootLink()->p() - this->robot_->centerOfMass()).cross(this->robot_->rootLink()->F_ext().head<3>()); // world frame. comまわり
 
     cnoid::Vector3 Iw_error = this->target_Iw_ - Iw; // world frame. comまわり
