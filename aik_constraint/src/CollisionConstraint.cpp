@@ -73,9 +73,9 @@ namespace aik_constraint{
                                             );
     }
 
-    cnoid::Position A_localpos = cnoid::Position::Identity();
+    cnoid::Isometry3 A_localpos = cnoid::Isometry3::Identity();
     A_localpos.translation() = this->A_currentLocalp_;
-    cnoid::Position B_localpos = cnoid::Position::Identity();
+    cnoid::Isometry3 B_localpos = cnoid::Isometry3::Identity();
     B_localpos.translation() = this->B_currentLocalp_;
     aik_constraint::calc6DofJacobianCoef(this->jacobianIneq_joints_,//input
                                          this->jacobianIneq_A_link_,//input

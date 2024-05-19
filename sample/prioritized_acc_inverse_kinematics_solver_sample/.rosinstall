@@ -1,3 +1,4 @@
 - git:
-    local-name: choreonoid_viewer
-    uri: https://github.com/Naoki-Hiraoka/choreonoid_viewer.git
+    local-name: choreonoid_viewer22
+    uri: https://github.com/Naoki-Hiraoka/choreonoid_viewer2.git
+    version: 2.0

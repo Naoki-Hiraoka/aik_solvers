@@ -23,14 +23,14 @@ namespace aik_constraint{
     //  localvel: parent link frame. endeffector origin
     const cnoid::LinkPtr& A_link() const { return A_link_;}
     cnoid::LinkPtr& A_link() { return A_link_;}
-    const cnoid::Position& A_localpos() const { return A_localpos_;}
-    cnoid::Position& A_localpos() { return A_localpos_;}
+    const cnoid::Isometry3& A_localpos() const { return A_localpos_;}
+    cnoid::Isometry3& A_localpos() { return A_localpos_;}
     const cnoid::Vector6& A_localvel() const { return A_localvel_;}
     cnoid::Vector6& A_localvel() { return A_localvel_;}
     const cnoid::LinkPtr& B_link() const { return B_link_;}
     cnoid::LinkPtr& B_link() { return B_link_;}
-    const cnoid::Position& B_localpos() const { return B_localpos_;}
-    cnoid::Position& B_localpos() { return B_localpos_;}
+    const cnoid::Isometry3& B_localpos() const { return B_localpos_;}
+    cnoid::Isometry3& B_localpos() { return B_localpos_;}
     const cnoid::Vector6& B_localvel() const { return B_localvel_;}
     cnoid::Vector6& B_localvel() { return B_localvel_;}
     const cnoid::Vector6& ref_acc() const { return ref_acc_;}
@@ -61,10 +61,10 @@ namespace aik_constraint{
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   private:
     cnoid::LinkPtr A_link_ = nullptr;
-    cnoid::Position A_localpos_ = cnoid::Position::Identity();
+    cnoid::Isometry3 A_localpos_ = cnoid::Isometry3::Identity();
     cnoid::Vector6 A_localvel_ = cnoid::Vector6::Zero();
     cnoid::LinkPtr B_link_ = nullptr;
-    cnoid::Position B_localpos_ = cnoid::Position::Identity();
+    cnoid::Isometry3 B_localpos_ = cnoid::Isometry3::Identity();
     cnoid::Vector6 B_localvel_ = cnoid::Vector6::Zero();
     cnoid::Vector6 ref_acc_ = cnoid::Vector6::Zero();
     cnoid::Vector6 pgain_ = 400 * cnoid::Vector6::Ones();

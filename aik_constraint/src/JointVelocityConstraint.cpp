@@ -4,7 +4,7 @@
 namespace IK{
   bool JointVelocityConstraint::checkConvergence () {
     if(this->joint_) {
-      if (this->joint_->isRotationalJoint() || this->joint_->isPrismaticJoint()) {
+      if (this->joint_->isRevoluteJoint() || this->joint_->isPrismaticJoint()) {
 
         double lower = (this->joint_->dq_lower() - this->joint_->dq()) * dt_;
         double upper = (this->joint_->dq_upper() - this->joint_->dq()) * dt_;
@@ -69,14 +69,14 @@ namespace IK{
       }
 
       int rows;
-      if (this->joint_->isRotationalJoint() || this->joint_->isPrismaticJoint()) rows=1;
+      if (this->joint_->isRevoluteJoint() || this->joint_->isPrismaticJoint()) rows=1;
       else if (this->joint_->isFreeJoint()) rows = 6;
       else rows = 0;
 
       this->jacobianineq_ = Eigen::SparseMatrix<double,Eigen::RowMajor>(rows,cols);
 
       if(this->jacobianineqColMap_.find(this->jacobianineq_joint_) != this->jacobianineqColMap_.end()){
-        if(this->jacobianineq_joint_->isRotationalJoint() || this->jacobianineq_joint_->isPrismaticJoint()){
+        if(this->jacobianineq_joint_->isRevoluteJoint() || this->jacobianineq_joint_->isPrismaticJoint()){
           for(size_t i=0;i<rows;i++){
             this->jacobianineq_.insert(rows,this->jacobianineqColMap_[this->jacobianineq_joint_]+i) = 1;
           }
@@ -87,7 +87,7 @@ namespace IK{
 
     if(this->jacobianineqColMap_.find(this->jacobianineq_joint_) != this->jacobianineqColMap_.end()){
       int rows;
-      if (this->jacobianineq_joint_->isRotationalJoint() || this->jacobianineq_joint_->isPrismaticJoint()) rows=1;
+      if (this->jacobianineq_joint_->isRevoluteJoint() || this->jacobianineq_joint_->isPrismaticJoint()) rows=1;
       else if (this->jacobianineq_joint_->isFreeJoint()) rows = 6;
       else rows = 0;
 

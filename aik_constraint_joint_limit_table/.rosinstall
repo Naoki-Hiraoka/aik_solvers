@@ -1,7 +1,8 @@
 - git:
     local-name: choreonoid
     uri: https://github.com/choreonoid/choreonoid.git
-    version: release-1.7
+    version: release-2.1
 - git:
-    local-name: joint_limit_table
-    uri: https://github.com/Naoki-Hiraoka/joint_limit_table.git
+    local-name: joint_limit_table2
+    uri: https://github.com/Naoki-Hiraoka/joint_limit_table2.git
+    version: 2.0

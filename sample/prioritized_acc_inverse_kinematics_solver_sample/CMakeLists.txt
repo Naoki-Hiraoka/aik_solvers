@@ -21,20 +21,13 @@ include_directories(
   ${CHOREONOID_INCLUDE_DIRS}
 )
 
-# 相対パスを絶対パスに直す
-set(CHOREONOID_LIBRARIES_ABS)
-foreach(lib ${CHOREONOID_LIBRARIES})
-  find_library(${lib}_abs NAMES ${lib} PATHS ${CHOREONOID_LIBRARY_DIRS})
-  set(CHOREONOID_LIBRARIES_ABS ${CHOREONOID_LIBRARIES_ABS} ${${lib}_abs})
-endforeach(lib)
-
 add_executable(sampleSR1
   src/SampleSR1.cpp
 )
 
 target_link_libraries(sampleSR1
   ${catkin_LIBRARIES}
-  ${CHOREONOID_LIBRARIES_ABS}
+  ${CHOREONOID_BODY_LIBRARIES}
   )
 
 install(TARGETS sampleSR1
@@ -57,6 +50,6 @@ add_library(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin SHARED
 )
 target_link_libraries(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin
   ${catkin_LIBRARIES}
-  ${CHOREONOID_LIBRARIES_ABS}
+  ${CHOREONOID_BODY_PLUGIN_LIBRARIES}
   )
 set_target_properties(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CHOREONOID_PLUGIN_DIR})

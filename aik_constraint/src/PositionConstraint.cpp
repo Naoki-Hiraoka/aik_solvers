@@ -4,10 +4,10 @@
 namespace aik_constraint{
 
   void PositionConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
-    const cnoid::Position A_parent_pose = (this->A_link_) ? this->A_link_->T() : cnoid::Position::Identity(); // world frame
-    const cnoid::Position B_parent_pose = (this->B_link_) ? this->B_link_->T() : cnoid::Position::Identity(); // world frame
-    const cnoid::Position& A_pos = A_parent_pose * this->A_localpos_; // world frame
-    const cnoid::Position& B_pos = B_parent_pose * this->B_localpos_; // world frame
+    const cnoid::Isometry3 A_parent_pose = (this->A_link_) ? this->A_link_->T() : cnoid::Isometry3::Identity(); // world frame
+    const cnoid::Isometry3 B_parent_pose = (this->B_link_) ? this->B_link_->T() : cnoid::Isometry3::Identity(); // world frame
+    const cnoid::Isometry3& A_pos = A_parent_pose * this->A_localpos_; // world frame
+    const cnoid::Isometry3& B_pos = B_parent_pose * this->B_localpos_; // world frame
     cnoid::Vector6 A_vel = cnoid::Vector6::Zero(); // world frame
     if(this->A_link_){
       A_vel.head<3>() += this->A_link_->v();
@@ -167,8 +167,8 @@ namespace aik_constraint{
       this->drawOnObjects_ = std::vector<cnoid::SgNodePtr>{this->lines_};
     }
 
-    const cnoid::Position& A_pos = (this->A_link_) ? this->A_link_->T() * this->A_localpos_ : this->A_localpos_;
-    const cnoid::Position& B_pos = (this->B_link_) ? this->B_link_->T() * this->B_localpos_ : this->B_localpos_;
+    const cnoid::Isometry3& A_pos = (this->A_link_) ? this->A_link_->T() * this->A_localpos_ : this->A_localpos_;
+    const cnoid::Isometry3& B_pos = (this->B_link_) ? this->B_link_->T() * this->B_localpos_ : this->B_localpos_;
 
     this->lines_->getOrCreateVertices()->at(0) = A_pos.translation().cast<cnoid::Vector3f::Scalar>();
     this->lines_->getOrCreateVertices()->at(1) = (A_pos * (0.05 * cnoid::Vector3::UnitX())).cast<cnoid::Vector3f::Scalar>();

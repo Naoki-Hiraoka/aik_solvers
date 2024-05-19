@@ -46,7 +46,7 @@ namespace IK{
 
       // ワールド系，原点まわりへ
       Eigen::Matrix<double,6,6> T=Eigen::Matrix<double,6,6>::Zero();
-      const cnoid::Position pos = this->endeffectors[i]->getlink()->T() * this->endeffectors[i]->getlocalpos();
+      const cnoid::Isometry3 pos = this->endeffectors[i]->getlink()->T() * this->endeffectors[i]->getlocalpos();
       const cnoid::Matrix3& R = pos.linear();
       const cnoid::Matrix3& p_x_R = cnoid::hat(pos.translation()) * R;
       T.topLeftCorner<3,3>() = R;

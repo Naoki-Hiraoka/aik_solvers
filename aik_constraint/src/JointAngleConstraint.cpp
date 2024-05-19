@@ -3,7 +3,7 @@
 
 namespace aik_constraint{
   void JointAngleConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
-    if(!this->joint_ || !(this->joint_->isRotationalJoint() || this->joint_->isPrismaticJoint())) {
+    if(!this->joint_ || !(this->joint_->isRevoluteJoint() || this->joint_->isPrismaticJoint())) {
       this->eq_.resize(0);
       this->jacobian_.resize(0,0);
       this->jacobian_joint_ = nullptr;

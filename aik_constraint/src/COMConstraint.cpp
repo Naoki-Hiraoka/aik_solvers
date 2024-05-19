@@ -139,9 +139,9 @@ namespace aik_constraint{
       this->drawOnObjects_ = std::vector<cnoid::SgNodePtr>{this->lines_};
     }
 
-    cnoid::Position A_pos = cnoid::Position::Identity();
+    cnoid::Isometry3 A_pos = cnoid::Isometry3::Identity();
     A_pos.translation() = this->A_robot_ ? this->A_robot_->centerOfMass() + this->A_localp_ : this->A_localp_;
-    cnoid::Position B_pos = cnoid::Position::Identity();
+    cnoid::Isometry3 B_pos = cnoid::Isometry3::Identity();
     B_pos.translation() = this->B_robot_ ? this->B_robot_->centerOfMass() + this->B_localp_ : this->B_localp_;
 
     this->lines_->getOrCreateVertices()->at(0) = A_pos.translation().cast<cnoid::Vector3f::Scalar>();

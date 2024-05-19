@@ -115,7 +115,7 @@ namespace IK{
     G_tripletList.push_back(Eigen::Triplet<double>(4,0,this->robot->mass()*this->g));
     h[2] = this->robot->mass()*this->g;
     for (size_t i=0;i<this->endeffectors.size();i++){
-      const cnoid::Position pos = this->endeffectors[i]->getlink()->T() * this->endeffectors[i]->getlocalpos();
+      const cnoid::Isometry3 pos = this->endeffectors[i]->getlink()->T() * this->endeffectors[i]->getlocalpos();
       const cnoid::Matrix3& R = pos.linear();
       const cnoid::Matrix3& p_x_R = cnoid::hat(pos.translation()) * R;
 

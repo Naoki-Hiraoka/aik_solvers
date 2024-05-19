@@ -32,7 +32,7 @@ namespace aik_constraint {
       tripletList.push_back(Eigen::Triplet<double>(2,idx+3,1));
       tripletList.push_back(Eigen::Triplet<double>(2,idx+4,1));
 
-    } else if(joint->isRotationalJoint()){
+    } else if(joint->isRevoluteJoint()){
       tripletList.push_back(Eigen::Triplet<double>(0,idx,1));
       tripletList.push_back(Eigen::Triplet<double>(1,idx,1));
       tripletList.push_back(Eigen::Triplet<double>(2,idx,1));
@@ -74,7 +74,7 @@ namespace aik_constraint {
       jacobian.coeffRef(2,idx+3)=sign*dp[1];
       jacobian.coeffRef(2,idx+4)=-sign*dp[0];
 
-    } else if(joint->isRotationalJoint()){
+    } else if(joint->isRevoluteJoint()){
       cnoid::Vector3 omega = joint->R() * joint->a();
       cnoid::Vector3 dp = omega.cross(target_p - joint->p());
       jacobian.coeffRef(0,idx)=sign*dp[0];
@@ -167,9 +167,9 @@ namespace aik_constraint {
   //   jacobianの形状は上の関数で既に整えられている前提.
   void calc6DofJacobianCoef(const std::vector<cnoid::LinkPtr>& joints, //input
                             const cnoid::LinkPtr& A_link, //input
-                            const cnoid::Position& A_localpos, //input
+                            const cnoid::Isometry3& A_localpos, //input
                             const cnoid::LinkPtr& B_link, //input
-                            const cnoid::Position& B_localpos, //input
+                            const cnoid::Isometry3& B_localpos, //input
                             std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
                             const std::vector<cnoid::LinkPtr>& path_A_joints, //input
                             const std::vector<cnoid::LinkPtr>& path_B_joints, //input
@@ -183,12 +183,12 @@ namespace aik_constraint {
       for(size_t i=0;i<2;i++){//0:A_link, 1:B_link
         int sign = i ? -1 : 1;
         cnoid::LinkPtr target_link = i ? B_link : A_link;
-        const cnoid::Position& target_localpos = i ? B_localpos : A_localpos;
+        const cnoid::Isometry3& target_localpos = i ? B_localpos : A_localpos;
         const std::vector<cnoid::LinkPtr>& path_joints = i ? path_B_joints : path_A_joints;
 
         if(!target_link) continue;//world固定なので飛ばす
 
-        const cnoid::Position target_position = target_link->T() * target_localpos;
+        const cnoid::Isometry3 target_position = target_link->T() * target_localpos;
         const cnoid::Vector3 target_p = target_position.translation();
 
         for(size_t j=0;j<path_joints.size();j++){
@@ -403,7 +403,7 @@ namespace aik_constraint {
       // compute Jacobian
       for(int i=0; i < nj; ++i){
         cnoid::Link* joint = body->joint(i);
-        if(joint->isRotationalJoint()){
+        if(joint->isRevoluteJoint()){
           const cnoid::Vector3 omega = sgn[joint->jointId()] * joint->R() * joint->a();
           const SubMass& sub = subMasses[joint->index()];
           const cnoid::Vector3 Mcol = M.col(joint->jointId());
