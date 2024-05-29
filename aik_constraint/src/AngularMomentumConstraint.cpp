@@ -3,17 +3,18 @@
 #include <aik_constraint/Jacobian.h>
 
 namespace aik_constraint{
-  void AngularMomentumConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
+  void AngularMomentumConstraint::update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces) {
     if(!this->robot_) {
       this->eq_.resize(0);
       this->jacobian_.resize(0,0);
       this->jacobian_robot_ = nullptr;
       this->jacobian_joints_.resize(0);
+      this->jacobian_forces_.resize(0);
       return;
     }
 
     Eigen::MatrixXd AMJ;
-    aik_constraint::cnoid18::calcAngularMomentumJacobian(this->robot_,nullptr,AMJ); // [joint root]の順. comまわり
+    cnoid::calcAngularMomentumJacobian(this->robot_,nullptr,AMJ); // [joint root]の順. comまわり
 
     cnoid::Matrix3 I = AMJ.block<3,3>(0,this->robot_->numJoints()+3); //world系. comまわり
     cnoid::Matrix3 I_evalR = this->eval_R_.transpose() * I * this->eval_R_; //eval_R系
@@ -57,11 +58,14 @@ namespace aik_constraint{
     // calc jacobian
     // 行列の初期化. 前回とcol形状が変わっていないなら再利用
     if(!this->isJointsSame(joints,this->jacobian_joints_)
+       || !this->isForcesSame(forces,this->jacobian_forces_)
        || this->robot_ != this->jacobian_robot_){
       this->jacobian_joints_ = joints;
+      this->jacobian_forces_ = forces;
       this->jacobian_robot_ = this->robot_;
 
       aik_constraint::calcAngularMomentumJacobianShape(this->jacobian_joints_,
+                                                       this->jacobian_forces_,
                                                        this->jacobian_robot_,
                                                        nullptr,
                                                        this->jacobian_full_,
@@ -69,6 +73,7 @@ namespace aik_constraint{
     }
 
     aik_constraint::calcAngularMomentumJacobianCoef(this->jacobian_joints_,
+                                                    this->jacobian_forces_,
                                                     this->jacobian_robot_,
                                                     nullptr,
                                                     AMJ,

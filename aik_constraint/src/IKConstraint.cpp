@@ -9,6 +9,14 @@ namespace aik_constraint{
     return true;
   }
 
+  bool IKConstraint::isForcesSame(const std::vector<std::shared_ptr<Force> >& forces1,const std::vector<std::shared_ptr<Force> >& forces2) {
+    if (forces1.size() != forces2.size() ) return false;
+    for(size_t i=0;i<forces1.size();i++){
+      if (forces1[i] != forces2[i] ) return false;
+    }
+    return true;
+  }
+
   size_t IKConstraint::getJointDOF(const cnoid::LinkPtr& joint) {
     if(joint->isRevoluteJoint() || joint->isPrismaticJoint()) return 1;
     else if(joint->isFreeJoint()) return 6;

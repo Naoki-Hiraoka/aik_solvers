@@ -3,7 +3,7 @@
 
 namespace aik_constraint{
 
-  void PositionConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
+  void PositionConstraint::update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces) {
     const cnoid::Isometry3 A_parent_pose = (this->A_link_) ? this->A_link_->T() : cnoid::Isometry3::Identity(); // world frame
     const cnoid::Isometry3 B_parent_pose = (this->B_link_) ? this->B_link_->T() : cnoid::Isometry3::Identity(); // world frame
     const cnoid::Isometry3& A_pos = A_parent_pose * this->A_localpos_; // world frame
@@ -72,13 +72,16 @@ namespace aik_constraint{
     {
       // 行列の初期化. 前回とcol形状が変わっていないなら再利用
       if(!this->isJointsSame(joints,this->jacobian_joints_)
+         || !this->isForcesSame(forces,this->jacobian_forces_)
          || this->A_link_ != this->jacobian_A_link_
          || this->B_link_ != this->jacobian_B_link_){
         this->jacobian_joints_ = joints;
+        this->jacobian_forces_ = forces;
         this->jacobian_A_link_ = this->A_link_;
         this->jacobian_B_link_ = this->B_link_;
 
         aik_constraint::calc6DofJacobianShape(this->jacobian_joints_,//input
+                                              this->jacobian_forces_,//input
                                               this->jacobian_A_link_,//input
                                               this->jacobian_B_link_,//input
                                               true,//input
@@ -92,6 +95,7 @@ namespace aik_constraint{
       }
 
       aik_constraint::calc6DofJacobianCoef(this->jacobian_joints_,//input
+                                           this->jacobian_forces_,//input
                                            this->jacobian_A_link_,//input
                                            this->A_localpos_,//input
                                            this->jacobian_B_link_,//input

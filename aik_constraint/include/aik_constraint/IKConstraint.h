@@ -5,6 +5,8 @@
 #include <cnoid/SceneDrawables>
 #include <Eigen/Sparse>
 #include <unordered_map>
+#include <memory>
+#include <aik_constraint/Force.h>
 
 namespace aik_constraint{
   class IKConstraint
@@ -14,7 +16,7 @@ namespace aik_constraint{
     // 必ず,状態更新(全リンクのF_extは0. 探索変数のリンクのddqは0) -> ForwardKinematics(true,true) -> calcCenterOfMass() -> calcInverseDynamics()してrootLinkが受ける力(rootLinkまわり)をrootLink->F_ext()に入れる -> update() -> getError() / getJacobian / getMin/MaxIneq / getJacobianIneq / getDrawOnObjects の順で呼ぶので、同じ処理を何度も行うのではなく最初に呼ばれる関数で1回だけ行って以降はキャッシュを使ってよい
 
     // 内部状態更新
-    virtual void update (const std::vector<cnoid::LinkPtr>& joints) { return; }
+    virtual void update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces = std::vector<std::shared_ptr<Force> >()) { return; }
 
     // for debug view
     virtual const std::vector<cnoid::SgNodePtr>& getDrawOnObjects() { return this->drawOnObjects_; }
@@ -38,6 +40,7 @@ namespace aik_constraint{
 
     static size_t getJointDOF(const cnoid::LinkPtr& joint);
     static bool isJointsSame(const std::vector<cnoid::LinkPtr>& joints1,const std::vector<cnoid::LinkPtr>& joints2);
+    static bool isForcesSame(const std::vector<std::shared_ptr<Force> >& forces1,const std::vector<std::shared_ptr<Force> >& forces2);
     static double clamp(const double& value, const double& limit_value) {
       return std::min(std::max(value, -limit_value), limit_value);
     }

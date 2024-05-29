@@ -3,7 +3,7 @@
 #include <cnoid/Jacobian>
 
 namespace aik_constraint{
-  void COMConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
+  void COMConstraint::update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces) {
 
     Eigen::MatrixXd A_CMJ;
     if(this->A_robot_) cnoid::calcCMJacobian(this->A_robot_,nullptr,A_CMJ); // [joint root]の順
@@ -66,26 +66,30 @@ namespace aik_constraint{
     // jacobianの計算
     // 行列の初期化. 前回とcol形状が変わっていないなら再利用
     if(!this->isJointsSame(joints,this->jacobian_joints_)
+       || !this->isForcesSame(forces,this->jacobian_forces_)
        || this->A_robot_ != this->jacobian_A_robot_
        || this->B_robot_ != this->jacobian_B_robot_){
       this->jacobian_joints_ = joints;
+      this->jacobian_forces_ = forces;
       this->jacobian_A_robot_ = this->A_robot_;
       this->jacobian_B_robot_ = this->B_robot_;
 
       aik_constraint::calcCMJacobianShape(this->jacobian_joints_,
-                              this->jacobian_A_robot_,
-                              this->jacobian_B_robot_,
-                              this->jacobian_full_,
-                              this->jacobianColMap_);
+                                          this->jacobian_forces_,
+                                          this->jacobian_A_robot_,
+                                          this->jacobian_B_robot_,
+                                          this->jacobian_full_,
+                                          this->jacobianColMap_);
     }
 
     aik_constraint::calcCMJacobianCoef(this->jacobian_joints_,
-                           this->jacobian_A_robot_,
-                           this->jacobian_B_robot_,
-                           A_CMJ,
-                           B_CMJ,
-                           this->jacobianColMap_,
-                           this->jacobian_full_);
+                                       this->jacobian_forces_,
+                                       this->jacobian_A_robot_,
+                                       this->jacobian_B_robot_,
+                                       A_CMJ,
+                                       B_CMJ,
+                                       this->jacobianColMap_,
+                                       this->jacobian_full_);
 
     Eigen::SparseMatrix<double,Eigen::RowMajor> eval_R(3,3);
     for(int i=0;i<3;i++) for(int j=0;j<3;j++) eval_R.insert(i,j) = this->eval_R_(i,j);

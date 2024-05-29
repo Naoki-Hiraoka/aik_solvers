@@ -34,7 +34,7 @@ namespace aik_constraint{
     const double& weight() const { return weight_;}
     double& weight() { return weight_;}
 
-    void update (const std::vector<cnoid::LinkPtr>& joints) override;
+    void update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces) override;
 
   private:
     cnoid::LinkPtr joint_ = nullptr;
@@ -50,6 +50,7 @@ namespace aik_constraint{
 
     cnoid::LinkPtr jacobian_joint_ = nullptr; //前回jacobian_を計算した時のjoint
     std::vector<cnoid::LinkPtr> jacobian_joints_; // 前回のjacobian計算時のjoints
+    std::vector<std::shared_ptr<Force> > jacobian_forces_; // 前回のjacobian計算時のforces
     std::unordered_map<cnoid::LinkPtr,int> jacobianColMap_;
   };
 }

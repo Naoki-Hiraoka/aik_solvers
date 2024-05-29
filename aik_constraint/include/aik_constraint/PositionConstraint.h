@@ -53,7 +53,7 @@ namespace aik_constraint{
     cnoid::Matrix3d& eval_localR() { return eval_localR_;}
 
     // 内部状態更新
-    void update (const std::vector<cnoid::LinkPtr>& joints) override;
+    void update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces) override;
 
     // for debug view
     const std::vector<cnoid::SgNodePtr>& getDrawOnObjects() override;
@@ -81,6 +81,7 @@ namespace aik_constraint{
     cnoid::LinkPtr jacobian_A_link_ = nullptr;// 前回のjacobian計算時のA_link
     cnoid::LinkPtr jacobian_B_link_ = nullptr;// 前回のjacobian計算時のB_link
     std::vector<cnoid::LinkPtr> jacobian_joints_; // 前回のjacobian計算時のjoints
+    std::vector<std::shared_ptr<Force> > jacobian_forces_; // 前回のjacobian計算時のforces
 
     std::vector<cnoid::LinkPtr> path_A_joints_;
     std::vector<cnoid::LinkPtr> path_B_joints_;

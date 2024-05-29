@@ -6,7 +6,7 @@
 
 namespace aik_constraint{
 
-  void CollisionConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
+  void CollisionConstraint::update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces) {
 
     double distance;
     bool solved = this->computeDistance(this->A_link_, this->B_link_,
@@ -54,13 +54,16 @@ namespace aik_constraint{
     // calc jacobian
     // 行列の初期化. 前回とcol形状が変わっていないなら再利用
     if(!this->isJointsSame(joints,this->jacobianIneq_joints_)
+       || !this->isForcesSame(forces,this->jacobianIneq_forces_)
        || this->A_link_ != this->jacobianIneq_A_link_
        || this->B_link_ != this->jacobianIneq_B_link_){
       this->jacobianIneq_joints_ = joints;
+      this->jacobianIneq_forces_ = forces;
       this->jacobianIneq_A_link_ = this->A_link_;
       this->jacobianIneq_B_link_ = this->B_link_;
 
       aik_constraint::calc6DofJacobianShape(this->jacobianIneq_joints_,//input
+                                            this->jacobianIneq_forces_,//input
                                             this->jacobianIneq_A_link_,//input
                                             this->jacobianIneq_B_link_,//input
                                             false,//input
@@ -78,6 +81,7 @@ namespace aik_constraint{
     cnoid::Isometry3 B_localpos = cnoid::Isometry3::Identity();
     B_localpos.translation() = this->B_currentLocalp_;
     aik_constraint::calc6DofJacobianCoef(this->jacobianIneq_joints_,//input
+                                         this->jacobianIneq_forces_,//input
                                          this->jacobianIneq_A_link_,//input
                                          A_localpos,//input
                                          this->jacobianIneq_B_link_,//input

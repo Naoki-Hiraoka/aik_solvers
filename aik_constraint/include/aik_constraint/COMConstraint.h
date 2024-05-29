@@ -45,7 +45,7 @@ namespace aik_constraint{
     const cnoid::Vector3& weight() const { return weight_;}
     cnoid::Vector3& weight() { return weight_;}
 
-    void update (const std::vector<cnoid::LinkPtr>& joints) override;
+    void update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces) override;
 
     // for debug view
     const std::vector<cnoid::SgNodePtr>& getDrawOnObjects() override;
@@ -72,6 +72,7 @@ namespace aik_constraint{
     cnoid::BodyPtr jacobian_A_robot_ = nullptr;// 前回のjacobian計算時のrobot
     cnoid::BodyPtr jacobian_B_robot_ = nullptr;// 前回のjacobian計算時のrobot
     std::vector<cnoid::LinkPtr> jacobian_joints_; // 前回のjacobian計算時のjoints
+    std::vector<std::shared_ptr<Force> > jacobian_forces_; // 前回のjacobian計算時のforces
     Eigen::SparseMatrix<double,Eigen::RowMajor> jacobian_full_;
     Eigen::SparseMatrix<double,Eigen::RowMajor> jacobian_full_local_;
     std::unordered_map<cnoid::LinkPtr,int> jacobianColMap_;

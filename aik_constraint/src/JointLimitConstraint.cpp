@@ -2,7 +2,7 @@
 #include <iostream>
 
 namespace aik_constraint{
-  void JointLimitConstraint::update (const std::vector<cnoid::LinkPtr>& joints) {
+  void JointLimitConstraint::update (const std::vector<cnoid::LinkPtr>& joints, const std::vector<std::shared_ptr<Force> >& forces) {
     if(!this->joint_ || !(this->joint_->isRevoluteJoint() || this->joint_->isPrismaticJoint())) {
       this->eq_.resize(0);
       this->jacobian_.resize(0,0);
@@ -10,6 +10,7 @@ namespace aik_constraint{
       this->maxIneq_.resize(0);
       this->jacobianIneq_.resize(0,0);
       this->jacobianIneq_joints_.resize(0);
+      this->jacobianIneq_forces_.resize(0);
       this->jacobianIneq_joint_ = nullptr;
       return;
     }
@@ -38,14 +39,19 @@ namespace aik_constraint{
 
     // calc jacobian
     if(!this->isJointsSame(joints,this->jacobianIneq_joints_) ||
+       !this->isForcesSame(forces,this->jacobianIneq_forces_) ||
        this->joint_ != this->jacobianIneq_joint_){
       this->jacobianIneq_joints_ = joints;
+      this->jacobianIneq_forces_ = forces;
       this->jacobianIneq_joint_ = this->joint_;
       this->jacobianIneqColMap_.clear();
       int cols = 0;
       for(size_t i=0; i < this->jacobianIneq_joints_.size(); i++){
         this->jacobianIneqColMap_[this->jacobianIneq_joints_[i]] = cols;
         cols += this->getJointDOF(this->jacobianIneq_joints_[i]);
+      }
+      for(size_t i=0; i < this->jacobianIneq_forces_.size(); i++){
+        cols += this->jacobianIneq_forces_[i]->DOF();
       }
 
       this->jacobianIneq_ = Eigen::SparseMatrix<double,Eigen::RowMajor>(1,cols);
