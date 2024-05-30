@@ -16,9 +16,9 @@ namespace prioritized_acc_inverse_kinematics_solver {
    */
   class IKParam {
   public:
-    double ddqWeight = 1.0;
+    double ddqWeight = 1e-6;
     std::vector<double> ddqWeightVec; // ddqWeightVec.size() == dim(variables)の場合、探索変数の各要素について、wnをddqWeightVec倍する. 通常はddqWeight倍する.
-    double forceWeight = 1e-6;
+    double forceWeight = 1e-12;
     std::vector<double> forceWeightVec; // forceWeightVec.size() == dim(forces)の場合、探索変数の各要素について、wnをforceWeightVec倍する. 通常はforceWeight倍する.
     double wn = 1e0;
     std::vector<double> wnVec; // wnVec.size() == ikc_list.size()の場合、wnの代わりにこっちを使う

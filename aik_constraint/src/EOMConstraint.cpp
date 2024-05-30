@@ -95,12 +95,12 @@ namespace aik_constraint {
       if(sign==0.0) continue;
       Eigen::SparseMatrix<double,Eigen::ColMajor> GraspMatrix(6,6);
       {
-        const cnoid::Isometry3d pose = this->jacobian_forces_[i]->A_link() ? this->jacobian_forces_[i]->A_link()->R() * this->jacobian_forces_[i]->A_localpos() : this->jacobian_forces_[i]->A_localpos();
+        const cnoid::Isometry3d pose = this->jacobian_forces_[i]->A_link() ? this->jacobian_forces_[i]->A_link()->T() * this->jacobian_forces_[i]->A_localpos() : this->jacobian_forces_[i]->A_localpos();
         const Eigen::Matrix3d& R = pose.linear();
         const Eigen::Matrix3d& p_x_R = aik_constraint::hat(pose.translation() - this->robot_->centerOfMass()) * R;
         /*
           |R   0|
-            |pxR R|
+          |pxR R|
         */
         for(int k=0;k<3;k++){
           for(int j=0;j<3;j++) GraspMatrix.insert(j,k) = R(j,k);

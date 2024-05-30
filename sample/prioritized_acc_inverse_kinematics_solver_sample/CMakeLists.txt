@@ -49,6 +49,8 @@ add_library(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin SHARED
   src/sample10_angular.cpp
   src/sample11_wrench.cpp
   src/sample12_wrench.cpp
+  src/sample13_wrench_ik.cpp
+  src/sample14_wrench_move.cpp
 )
 target_link_libraries(CnoidPrioritizedAccInverseKinematicsSolverSamplePlugin
   ${catkin_LIBRARIES}
