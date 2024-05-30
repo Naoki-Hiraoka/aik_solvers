@@ -274,7 +274,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
 
         int t = i % 2000;
         std::vector<footguidedcontroller::LinearTrajectory<cnoid::Vector3> > traj;
-        double l = 0.08;
+        double l = 0.10;
         double f = 250;
         if(t<1*f){
           traj.emplace_back(cnoid::Vector3(0.0,l*t/f,0.7),cnoid::Vector3(0.0,l,0.7),(1*f-t)*dt);
