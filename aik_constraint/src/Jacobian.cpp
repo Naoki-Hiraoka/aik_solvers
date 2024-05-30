@@ -215,11 +215,12 @@ namespace aik_constraint {
     }
   }
 
+  template<int Options>
   void calcCMJacobianShape(const std::vector<cnoid::LinkPtr>& joints,
                            const std::vector<std::shared_ptr<Force> >& forces, //input
                            const cnoid::BodyPtr& A_robot,
                            const cnoid::BodyPtr& B_robot,
-                           Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian,
+                           Eigen::SparseMatrix<double,Options>& jacobian,
                            std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap){
     jacobianColMap.clear();
     int cols = 0;
@@ -230,7 +231,7 @@ namespace aik_constraint {
     for(size_t i=0;i<forces.size();i++){
       cols += forces[i]->DOF();
     }
-    jacobian = Eigen::SparseMatrix<double,Eigen::RowMajor>(3,cols);
+    jacobian = Eigen::SparseMatrix<double,Options>(3,cols);
 
     std::vector<Eigen::Triplet<double> > tripletList;
     tripletList.reserve(100);//適当
@@ -263,7 +264,23 @@ namespace aik_constraint {
     }
     jacobian.setFromTriplets(tripletList.begin(), tripletList.end());
   }
+  // 明示的実体化
+  template void calcCMJacobianShape(const std::vector<cnoid::LinkPtr>& joints,//input
+                                    const std::vector<std::shared_ptr<Force> >& forces, //input
+                                    const cnoid::BodyPtr& A_robot,//input
+                                    const cnoid::BodyPtr& B_robot,//input
+                                    Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian,//output
+                                    std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap //output
+                                    );
+  template void calcCMJacobianShape(const std::vector<cnoid::LinkPtr>& joints,//input
+                                    const std::vector<std::shared_ptr<Force> >& forces, //input
+                                    const cnoid::BodyPtr& A_robot,//input
+                                    const cnoid::BodyPtr& B_robot,//input
+                                    Eigen::SparseMatrix<double,Eigen::ColMajor>& jacobian,//output
+                                    std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap //output
+                                    );
 
+  template<int Options>
   void calcCMJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
                           const std::vector<std::shared_ptr<Force> >& forces, //input
                           const cnoid::BodyPtr& A_robot,//input
@@ -271,7 +288,7 @@ namespace aik_constraint {
                           const Eigen::MatrixXd& A_CMJ, //[joint root]の順 input
                           const Eigen::MatrixXd& B_CMJ, //[joint root]の順 input
                           std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
-                          Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
+                          Eigen::SparseMatrix<double,Options>& jacobian//output
                           ) {
     if(A_robot != B_robot){
       for(size_t i=0;i<2; i++){
@@ -305,13 +322,31 @@ namespace aik_constraint {
     }
 
   }
+  template void calcCMJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
+                                   const std::vector<std::shared_ptr<Force> >& forces, //input
+                                   const cnoid::BodyPtr& A_robot,//input
+                                   const cnoid::BodyPtr& B_robot,//input
+                                   const Eigen::MatrixXd& A_CMJ, //[joint root]の順 input
+                                   const Eigen::MatrixXd& B_CMJ, //[joint root]の順 input
+                                   std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
+                                   Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
+                                   );
+  template void calcCMJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
+                                   const std::vector<std::shared_ptr<Force> >& forces, //input
+                                   const cnoid::BodyPtr& A_robot,//input
+                                   const cnoid::BodyPtr& B_robot,//input
+                                   const Eigen::MatrixXd& A_CMJ, //[joint root]の順 input
+                                   const Eigen::MatrixXd& B_CMJ, //[joint root]の順 input
+                                   std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
+                                   Eigen::SparseMatrix<double,Eigen::ColMajor>& jacobian//output
+                                   );
 
-
+  template<int Options>
   void calcAngularMomentumJacobianShape(const std::vector<cnoid::LinkPtr>& joints,
                                         const std::vector<std::shared_ptr<Force> >& forces, //input
                                         const cnoid::BodyPtr& A_robot,
                                         const cnoid::BodyPtr& B_robot,
-                                        Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian,
+                                        Eigen::SparseMatrix<double,Options>& jacobian,
                                         std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap){
     jacobianColMap.clear();
     int cols = 0;
@@ -355,7 +390,20 @@ namespace aik_constraint {
     }
     jacobian.setFromTriplets(tripletList.begin(), tripletList.end());
   }
+  template void calcAngularMomentumJacobianShape(const std::vector<cnoid::LinkPtr>& joints,
+                                                 const std::vector<std::shared_ptr<Force> >& forces, //input
+                                                 const cnoid::BodyPtr& A_robot,
+                                                 const cnoid::BodyPtr& B_robot,
+                                                 Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian,
+                                                 std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap);
+  template void calcAngularMomentumJacobianShape(const std::vector<cnoid::LinkPtr>& joints,
+                                                 const std::vector<std::shared_ptr<Force> >& forces, //input
+                                                 const cnoid::BodyPtr& A_robot,
+                                                 const cnoid::BodyPtr& B_robot,
+                                                 Eigen::SparseMatrix<double,Eigen::ColMajor>& jacobian,
+                                                 std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap);
 
+  template<int Options>
   void calcAngularMomentumJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
                                        const std::vector<std::shared_ptr<Force> >& forces, //input
                                        const cnoid::BodyPtr& A_robot,//input
@@ -363,7 +411,7 @@ namespace aik_constraint {
                                        const Eigen::MatrixXd& A_AMJ, //[joint root]の順. comまわり input
                                        const Eigen::MatrixXd& B_AMJ, //[joint root]の順. comまわり input
                                        std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
-                                       Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
+                                       Eigen::SparseMatrix<double,Options>& jacobian//output
                                        ) {
     if(A_robot != B_robot){
       for(size_t i=0;i<2; i++){
@@ -396,7 +444,24 @@ namespace aik_constraint {
       }
     }
   }
-
+  template void calcAngularMomentumJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
+                                                const std::vector<std::shared_ptr<Force> >& forces, //input
+                                                const cnoid::BodyPtr& A_robot,//input
+                                                const cnoid::BodyPtr& B_robot,//input
+                                                const Eigen::MatrixXd& A_AMJ, //[joint root]の順. comまわり input
+                                                const Eigen::MatrixXd& B_AMJ, //[joint root]の順. comまわり input
+                                                std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
+                                                Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
+                                                );
+  template void calcAngularMomentumJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
+                                                const std::vector<std::shared_ptr<Force> >& forces, //input
+                                                const cnoid::BodyPtr& A_robot,//input
+                                                const cnoid::BodyPtr& B_robot,//input
+                                                const Eigen::MatrixXd& A_AMJ, //[joint root]の順. comまわり input
+                                                const Eigen::MatrixXd& B_AMJ, //[joint root]の順. comまわり input
+                                                std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
+                                                Eigen::SparseMatrix<double,Eigen::ColMajor>& jacobian//output
+                                                );
 }
 
 

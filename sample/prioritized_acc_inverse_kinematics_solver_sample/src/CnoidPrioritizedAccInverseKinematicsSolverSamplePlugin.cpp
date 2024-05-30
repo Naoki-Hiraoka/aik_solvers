@@ -94,6 +94,24 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
   };
   typedef cnoid::ref_ptr<sample10_angularItem> sample10_angularItemPtr;
 
+  void sample11_wrench();
+  class sample11_wrenchItem : public choreonoid_viewer::ViewerBaseItem {
+  public:
+    static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample11_wrenchItem>("sample11_wrenchItem"); }
+  protected:
+    virtual void main() override{ sample11_wrench(); return; }
+  };
+  typedef cnoid::ref_ptr<sample11_wrenchItem> sample11_wrenchItemPtr;
+
+  void sample12_wrench();
+  class sample12_wrenchItem : public choreonoid_viewer::ViewerBaseItem {
+  public:
+    static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample12_wrenchItem>("sample12_wrenchItem"); }
+  protected:
+    virtual void main() override{ sample12_wrench(); return; }
+  };
+  typedef cnoid::ref_ptr<sample12_wrenchItem> sample12_wrenchItemPtr;
+
 
   class PrioritizedAccInverseKinematicsSolverSamplePlugin : public cnoid::Plugin
   {
@@ -115,6 +133,8 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       sample8_collisionItem::initializeClass(this);
       sample9_collision_moveItem::initializeClass(this);
       sample10_angularItem::initializeClass(this);
+      sample11_wrenchItem::initializeClass(this);
+      sample12_wrenchItem::initializeClass(this);
       return true;
     }
   };

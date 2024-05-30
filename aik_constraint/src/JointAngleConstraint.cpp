@@ -19,6 +19,7 @@ namespace aik_constraint{
     target_acc += this->ref_acc_;
     target_acc += this->clamp(this->pgain_ * (targetq_ - this->joint_->q()), this->maxAccByPosError_);
     target_acc += this->clamp(this->dgain_ * (targetdq_ - this->joint_->dq()), this->maxAccByVelError_);
+    target_acc -= this->joint_->ddq();
     target_acc = this->clamp(target_acc, this->maxAcc_);
 
     if(this->eq_.rows() != 1) this->eq_ = Eigen::VectorXd(1);
@@ -53,7 +54,7 @@ namespace aik_constraint{
     }
 
 
-    if(this->debugLevel_>=1){
+    if(this->debugLevel_>=2){
       std::cerr << "JointAngleConstraint " << ((this->joint_)?this->joint_->name():"") <<  std::endl;
       std::cerr << "q dq targetq targetdq" << std::endl;
       std::cerr << this->joint_->q() << " " << this->joint_->dq() << " " << this->targetq_ << " " << this->targetdq_ << std::endl;

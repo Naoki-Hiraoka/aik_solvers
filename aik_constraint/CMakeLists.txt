@@ -27,6 +27,7 @@ include_directories(
 
 add_library(${PROJECT_NAME}
   src/Jacobian.cpp
+  src/Force.cpp
   src/IKConstraint.cpp
   src/PositionConstraint.cpp
   src/COMConstraint.cpp
@@ -38,6 +39,8 @@ add_library(${PROJECT_NAME}
   # src/JointVelocityConstraint.cpp
   src/CollisionConstraint.cpp
   src/ClientCollisionConstraint.cpp
+  src/ForceConstraint.cpp
+  src/EOMConstraint.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

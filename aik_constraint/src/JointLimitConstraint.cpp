@@ -18,11 +18,13 @@ namespace aik_constraint{
     double target_acc_lower = 0.0;
     target_acc_lower += std::min(this->pgain_ * (this->joint_->q_lower() - this->joint_->q()), this->maxAccByPosError_);
     target_acc_lower += std::min(this->dgain_ * ( - this->joint_->dq()), this->maxAccByVelError_);
+    target_acc_lower -= this->joint_->ddq();
     target_acc_lower = std::min(target_acc_lower, this->maxAcc_);
 
     double target_acc_upper = 0.0;
     target_acc_upper += std::max(this->pgain_ * (this->joint_->q_upper() - this->joint_->q()), -this->maxAccByPosError_);
     target_acc_upper += std::max(this->dgain_ * ( - this->joint_->dq()), -this->maxAccByVelError_);
+    target_acc_upper -= this->joint_->ddq();
     target_acc_upper = std::max(target_acc_upper, -this->maxAcc_);
 
     if(target_acc_upper <  target_acc_lower){ // 念の為
@@ -67,7 +69,7 @@ namespace aik_constraint{
     }
 
 
-    if(this->debugLevel_>=1){
+    if(this->debugLevel_>=2){
       std::cerr << "JointLimitConstraint" << std::endl;
       std::cerr << "q_lower q q_upper dq" << std::endl;
       std::cerr << this->joint_->q_lower() << " " << this->joint_->q() << " " << this->joint_->q_upper() << " " << this->joint_->dq() << std::endl;

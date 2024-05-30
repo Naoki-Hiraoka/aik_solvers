@@ -93,7 +93,7 @@ namespace aik_constraint{
       }
     }
 
-    if(this->debugLevel_>=1){
+    if(this->debugLevel_>=2){
       std::cerr << "AngularMomentumConstraint" << std::endl;
       std::cerr << "Iw target_Iw" << std::endl;
       std::cerr << Iw.transpose() << "  " << this->target_Iw_.transpose() << std::endl;

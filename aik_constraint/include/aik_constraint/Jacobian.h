@@ -11,6 +11,14 @@
 #include <aik_constraint/Force.h>
 
 namespace aik_constraint {
+  inline Eigen::Matrix3d hat(const Eigen::Vector3d& x) {
+    Eigen::Matrix3d M;
+    M <<  0.0, -x(2),   x(1),
+        x(2),   0.0,  -x(0),
+        -x(1),  x(0),   0.0;
+    return M;
+  }
+
   // world座標系で見た、A - B のヤコビアン. linkがnullptrの場合、localposはworld座標を意味する.
   //   jacobianを新たにコンストラクトし、非ゼロ要素に1を入れる.
   void calc6DofJacobianShape(const std::vector<cnoid::LinkPtr>& joints, //input
@@ -44,15 +52,18 @@ namespace aik_constraint {
 
   // world座標系で見た、A - B のヤコビアン. robotがnullptrの場合、world座標を意味する.
   //   jacobianを新たにコンストラクトし、非ゼロ要素に1を入れる.
+  template<int Options>
   void calcCMJacobianShape(const std::vector<cnoid::LinkPtr>& joints,//input
                            const std::vector<std::shared_ptr<Force> >& forces, //input
                            const cnoid::BodyPtr& A_robot,//input
                            const cnoid::BodyPtr& B_robot,//input
-                           Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian,//output
+                           Eigen::SparseMatrix<double,Options>& jacobian,//output
                            std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap //output
                            );
+
   // world座標系で見た、A - B のヤコビアン. robotがnullptrの場合、world座標を意味する.
   //   jacobianの形状は上の関数で既に整えられている前提.
+  template<int Options>
   void calcCMJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
                           const std::vector<std::shared_ptr<Force> >& forces, //input
                           const cnoid::BodyPtr& A_robot,//input
@@ -60,16 +71,18 @@ namespace aik_constraint {
                           const Eigen::MatrixXd& A_CMJ, //[joint root]の順 input
                           const Eigen::MatrixXd& B_CMJ, //[joint root]の順 input
                           std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
-                          Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
+                          Eigen::SparseMatrix<double,Options>& jacobian//output
                           );
 
+  template<int Options>
   void calcAngularMomentumJacobianShape(const std::vector<cnoid::LinkPtr>& joints,//input
                                         const std::vector<std::shared_ptr<Force> >& forces, //input
                                         const cnoid::BodyPtr& A_robot,//input
                                         const cnoid::BodyPtr& B_robot,//input
-                                        Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian,//output
+                                        Eigen::SparseMatrix<double,Options>& jacobian,//output
                                         std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap //output
                                         );
+  template<int Options>
   void calcAngularMomentumJacobianCoef(const std::vector<cnoid::LinkPtr>& joints,//input
                                        const std::vector<std::shared_ptr<Force> >& forces, //input
                                        const cnoid::BodyPtr& A_robot,//input
@@ -77,7 +90,7 @@ namespace aik_constraint {
                                        const Eigen::MatrixXd& A_AMJ, //[joint root]の順. comまわり input
                                        const Eigen::MatrixXd& B_AMJ, //[joint root]の順. comまわり input
                                        std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
-                                       Eigen::SparseMatrix<double,Eigen::RowMajor>& jacobian//output
+                                       Eigen::SparseMatrix<double,Options>& jacobian//output
                                        );
 
 }

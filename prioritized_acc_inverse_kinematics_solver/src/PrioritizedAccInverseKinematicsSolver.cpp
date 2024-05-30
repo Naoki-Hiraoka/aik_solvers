@@ -7,6 +7,7 @@
 
 namespace prioritized_acc_inverse_kinematics_solver {
   bool solveAIK (const std::vector<cnoid::LinkPtr>& variables,
+                 const std::vector<std::shared_ptr<aik_constraint::Force> >& forces,
                  const std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > >& ikc_list,
                  std::vector<std::shared_ptr<prioritized_qp_base::Task> >& prevTasks,
                  const IKParam& param,
@@ -14,11 +15,11 @@ namespace prioritized_acc_inverse_kinematics_solver {
 
     // for debug
     cnoid::TimeMeasure timer;
-    if(param.debugLevel>0) timer.begin();
+    if(param.debugLevel>=1) timer.begin();
 
     for ( int i=0; i<ikc_list.size(); i++ ) {
       for(size_t j=0;j<ikc_list[i].size(); j++){
-        ikc_list[i][j]->update(variables);
+        ikc_list[i][j]->update(variables,forces);
       }
     }
 
@@ -26,8 +27,17 @@ namespace prioritized_acc_inverse_kinematics_solver {
     // H = J^T * We * J + Wn
     // Wn = (e^T * We * e + \bar{wn}) * Wq // Wq: modify to insert dq weight
 
-    double dim = 0;
-    for(size_t i=0;i<variables.size();i++) dim+=aik_constraint::IKConstraint::getJointDOF(variables[i]);
+    int dim = 0;
+    int ddqdim = 0;
+    int forcedim = 0;
+    for(size_t i=0;i<variables.size();i++) {
+      dim+=aik_constraint::IKConstraint::getJointDOF(variables[i]);
+      ddqdim+=aik_constraint::IKConstraint::getJointDOF(variables[i]);
+    }
+    for(size_t i=0;i<forces.size();i++) {
+      dim+=forces[i]->DOF();
+      forcedim+=forces[i]->DOF();
+    }
 
     if(prevTasks.size() != ikc_list.size()) {
       prevTasks.clear();
@@ -88,18 +98,25 @@ namespace prioritized_acc_inverse_kinematics_solver {
         idx_ineq += minineqs[j].get().rows();
       }
 
-      double sumError = 0;
-      sumError += prevTasks[i]->b().squaredNorm();
-      for(size_t j=0;j<prevTasks[i]->dl().size(); j++) {
-        if(prevTasks[i]->dl()[j]>0) sumError += std::pow(prevTasks[i]->dl()[j],2);
-        if(prevTasks[i]->du()[j]<0) sumError += std::pow(prevTasks[i]->du()[j],2);
+      // double sumError = 0;
+      // sumError += prevTasks[i]->b().squaredNorm();
+      // for(size_t j=0;j<prevTasks[i]->dl().size(); j++) {
+      //   if(prevTasks[i]->dl()[j]>0) sumError += std::pow(prevTasks[i]->dl()[j],2);
+      //   if(prevTasks[i]->du()[j]<0) sumError += std::pow(prevTasks[i]->du()[j],2);
+      // }
+      prevTasks[i]->w() = cnoid::VectorXd::Ones(dim) * ((param.wnVec.size()==ikc_list.size())?param.wnVec[i]:param.wn);
+      if(param.ddqWeightVec.size() == ddqdim) {
+        for(int j=0;j<ddqdim;j++) prevTasks[i]->w()[j] *= param.ddqWeightVec[j];
+      }else{
+        prevTasks[i]->w().head(ddqdim) *= param.ddqWeight;
       }
-      prevTasks[i]->w() = cnoid::VectorXd::Ones(dim) * (sumError * ((param.weVec.size()==ikc_list.size())?param.weVec[i]:param.we)+ ((param.wnVec.size()==ikc_list.size())?param.wnVec[i]:param.wn));
-      if(param.ddqWeight.size() == dim) {
-        for(int j=0;j<dim;j++) prevTasks[i]->w()[j] *= param.ddqWeight[j];
+      if(param.forceWeightVec.size() == forcedim) {
+        for(int j=0;j<forcedim;j++) prevTasks[i]->w()[ddqdim+j] *= param.forceWeightVec[j];
+      }else{
+        prevTasks[i]->w().tail(forcedim) *= param.forceWeight;
       }
 
-      if(param.debugLevel>0) prevTasks[i]->name() = std::string("Task") + std::to_string(i);
+      if(param.debugLevel>=2) prevTasks[i]->name() = std::string("Task") + std::to_string(i);
     }
 
     // solve
@@ -118,17 +135,21 @@ namespace prioritized_acc_inverse_kinematics_solver {
     for(size_t i=0;i<variables.size();i++){
       if(variables[i]->isRevoluteJoint() || variables[i]->isPrismaticJoint()){
         // update joint angles
-        variables[i]->ddq() = result[idx];
+        variables[i]->ddq() += result[idx];
       }else if(variables[i]->isFreeJoint()) {
         // update rootlink pos rot
-        variables[i]->dv() = result.segment<3>(idx);
-        variables[i]->dw() = result.segment<3>(idx+3);
+        variables[i]->dv() += result.segment<3>(idx);
+        variables[i]->dw() += result.segment<3>(idx+3);
       }
 
       idx += aik_constraint::IKConstraint::getJointDOF(variables[i]);
     }
+    for(size_t i=0;i<forces.size();i++){
+      forces[i]->F() += result.segment(idx,forces[i]->DOF());
+      idx += forces[i]->DOF();
+    }
 
-    if(param.debugLevel>0) {
+    if(param.debugLevel>=1) {
       double time = timer.measure();
       std::cerr << "[PrioritizedAIK] solveIKOnce time: " << time << "[s]" << std::endl;
     }

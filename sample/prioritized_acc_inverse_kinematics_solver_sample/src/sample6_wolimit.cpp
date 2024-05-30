@@ -136,6 +136,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       prioritized_acc_inverse_kinematics_solver::IKParam param;
       param.debugLevel = debugLevel;
       bool solved = prioritized_acc_inverse_kinematics_solver::solveAIK(variables,
+                                                                        std::vector<std::shared_ptr<aik_constraint::Force> >(),
                                                                         constraints,
                                                                         tasks,
                                                                         param);

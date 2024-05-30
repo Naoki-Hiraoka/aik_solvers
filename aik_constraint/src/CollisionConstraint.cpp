@@ -100,7 +100,7 @@ namespace aik_constraint{
     this->jacobianIneq_ = dir.transpose() * this->jacobianIneq_full_ * this->weight_;
 
 
-    if(this->debugLevel_>=1){
+    if(this->debugLevel_>=2){
       std::cerr << "CollisionConstraint " << this->A_link_->name() << " - " << this->B_link_->name() << std::endl;
       std::cerr << "distance: " << distance << std::endl;
       std::cerr << "d_distance: " << d_distance << std::endl;

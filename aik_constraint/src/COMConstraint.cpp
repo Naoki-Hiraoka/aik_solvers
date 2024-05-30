@@ -104,7 +104,7 @@ namespace aik_constraint{
     }
 
 
-    if(this->debugLevel_>=1){
+    if(this->debugLevel_>=2){
       std::cerr << "COMConstraint" << std::endl;
       std::cerr << "A pos "<<A_p.transpose() << std::endl;
       std::cerr << "B pos "<<B_p.transpose() << std::endl;
