@@ -61,23 +61,25 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       aik_constraint::Force::setFACE(force);
       forces.push_back(force);
 
-      std::shared_ptr<aik_constraint::ForceConstraint> constraint = std::make_shared<aik_constraint::ForceConstraint>();
-      constraint->force() = force;
-      constraint->dl() = Eigen::VectorXd::Zero(11);
-      constraint->C().resize(11,6);
-      constraint->du() = 1e10 * Eigen::VectorXd::Ones(11);
-      constraint->C().insert(0,2) = 1.0; constraint->du()[0] = 2000.0;
-      constraint->C().insert(1,0) = 1.0; constraint->C().insert(1,2) = 0.2;
-      constraint->C().insert(2,0) = -1.0; constraint->C().insert(2,2) = 0.2;
-      constraint->C().insert(3,1) = 1.0; constraint->C().insert(3,2) = 0.2;
-      constraint->C().insert(4,1) = -1.0; constraint->C().insert(4,2) = 0.2;
-      constraint->C().insert(5,2) = 0.05; constraint->C().insert(5,3) = 1.0;
-      constraint->C().insert(6,2) = 0.05; constraint->C().insert(6,3) = -1.0;
-      constraint->C().insert(7,2) = 0.12; constraint->C().insert(7,4) = 1.0;
-      constraint->C().insert(8,2) = 0.09; constraint->C().insert(8,4) = -1.0;
-      constraint->C().insert(9,2) = 0.005; constraint->C().insert(9,5) = 1.0;
-      constraint->C().insert(10,2) = 0.005; constraint->C().insert(10,5) = -1.0;
-      constraints0.push_back(constraint);
+      {
+        std::shared_ptr<aik_constraint::ForceConstraint> constraint = std::make_shared<aik_constraint::ForceConstraint>();
+        constraint->force() = force;
+        constraint->dl() = Eigen::VectorXd::Zero(11);
+        constraint->C().resize(11,6);
+        constraint->du() = 1e10 * Eigen::VectorXd::Ones(11);
+        constraint->C().insert(0,2) = 1.0; constraint->dl()[0] = 50.0; constraint->du()[0] = 2000.0;
+        constraint->C().insert(1,0) = 1.0; constraint->C().insert(1,2) = 0.2;
+        constraint->C().insert(2,0) = -1.0; constraint->C().insert(2,2) = 0.2;
+        constraint->C().insert(3,1) = 1.0; constraint->C().insert(3,2) = 0.2;
+        constraint->C().insert(4,1) = -1.0; constraint->C().insert(4,2) = 0.2;
+        constraint->C().insert(5,2) = 0.05; constraint->C().insert(5,3) = 1.0;
+        constraint->C().insert(6,2) = 0.05; constraint->C().insert(6,3) = -1.0;
+        constraint->C().insert(7,2) = 0.12; constraint->C().insert(7,4) = 1.0;
+        constraint->C().insert(8,2) = 0.09; constraint->C().insert(8,4) = -1.0;
+        constraint->C().insert(9,2) = 0.005; constraint->C().insert(9,5) = 1.0;
+        constraint->C().insert(10,2) = 0.005; constraint->C().insert(10,5) = -1.0;
+        constraints0.push_back(constraint);
+      }
     }
     {
       // lleg
@@ -88,23 +90,25 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       aik_constraint::Force::setFACE(force);
       forces.push_back(force);
 
-      std::shared_ptr<aik_constraint::ForceConstraint> constraint = std::make_shared<aik_constraint::ForceConstraint>();
-      constraint->force() = force;
-      constraint->dl() = Eigen::VectorXd::Zero(11);
-      constraint->C().resize(11,6);
-      constraint->du() = 1e10 * Eigen::VectorXd::Ones(11);
-      constraint->C().insert(0,2) = 1.0; constraint->du()[0] = 2000.0;
-      constraint->C().insert(1,0) = 1.0; constraint->C().insert(1,2) = 0.2;
-      constraint->C().insert(2,0) = -1.0; constraint->C().insert(2,2) = 0.2;
-      constraint->C().insert(3,1) = 1.0; constraint->C().insert(3,2) = 0.2;
-      constraint->C().insert(4,1) = -1.0; constraint->C().insert(4,2) = 0.2;
-      constraint->C().insert(5,2) = 0.05; constraint->C().insert(5,3) = 1.0;
-      constraint->C().insert(6,2) = 0.05; constraint->C().insert(6,3) = -1.0;
-      constraint->C().insert(7,2) = 0.12; constraint->C().insert(7,4) = 1.0;
-      constraint->C().insert(8,2) = 0.09; constraint->C().insert(8,4) = -1.0;
-      constraint->C().insert(9,2) = 0.005; constraint->C().insert(9,5) = 1.0;
-      constraint->C().insert(10,2) = 0.005; constraint->C().insert(10,5) = -1.0;
-      constraints0.push_back(constraint);
+      {
+        std::shared_ptr<aik_constraint::ForceConstraint> constraint = std::make_shared<aik_constraint::ForceConstraint>();
+        constraint->force() = force;
+        constraint->dl() = Eigen::VectorXd::Zero(11);
+        constraint->C().resize(11,6);
+        constraint->du() = 1e10 * Eigen::VectorXd::Ones(11);
+        constraint->C().insert(0,2) = 1.0; constraint->dl()[0] = 50.0; constraint->du()[0] = 2000.0;
+        constraint->C().insert(1,0) = 1.0; constraint->C().insert(1,2) = 0.2;
+        constraint->C().insert(2,0) = -1.0; constraint->C().insert(2,2) = 0.2;
+        constraint->C().insert(3,1) = 1.0; constraint->C().insert(3,2) = 0.2;
+        constraint->C().insert(4,1) = -1.0; constraint->C().insert(4,2) = 0.2;
+        constraint->C().insert(5,2) = 0.05; constraint->C().insert(5,3) = 1.0;
+        constraint->C().insert(6,2) = 0.05; constraint->C().insert(6,3) = -1.0;
+        constraint->C().insert(7,2) = 0.12; constraint->C().insert(7,4) = 1.0;
+        constraint->C().insert(8,2) = 0.09; constraint->C().insert(8,4) = -1.0;
+        constraint->C().insert(9,2) = 0.005; constraint->C().insert(9,5) = 1.0;
+        constraint->C().insert(10,2) = 0.005; constraint->C().insert(10,5) = -1.0;
+        constraints0.push_back(constraint);
+      }
     }
 
     {
@@ -178,7 +182,8 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       }
     }
 
-    int debugLevel = 1; // 0 or 1 or 2
+
+    int debugLevel = 2; // 0 or 1 or 2
     std::vector<std::shared_ptr<prioritized_qp_base::Task> > tasks;
     std::vector<cnoid::LinkPtr> variables;
     variables.push_back(robot->rootLink());

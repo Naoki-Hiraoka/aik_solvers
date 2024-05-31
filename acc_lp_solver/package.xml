@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>acc_lp_solver</name>
+  <version>0.0.0</version>
+  <description>The acc_lp_solver package</description>
+
+  <maintainer email="hiraoka@jsk.imi.i.u-tokyo.ac.jp">Naoki-Hiraoka</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>aik_constraint</depend>
+  <depend>clpeigen</depend>
+  <depend>choreonoid</depend>
+
+</package>

@@ -1,0 +1,8 @@
+- git:
+    local-name: choreonoid
+    uri: https://github.com/choreonoid/choreonoid.git
+    version: release-2.1
+- git:
+    local-name: lp_solvers
+    uri: https://github.com/Naoki-Hiraoka/lp_solvers.git
+    version: 1.0

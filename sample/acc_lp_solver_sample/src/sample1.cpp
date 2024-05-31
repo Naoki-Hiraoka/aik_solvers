@@ -6,12 +6,11 @@
 #include <iostream>
 #include <ros/package.h>
 
-#include <prioritized_acc_inverse_kinematics_solver/PrioritizedAccInverseKinematicsSolver.h>
-#include <prioritized_qp_osqp/prioritized_qp_osqp.h>
+#include <acc_lp_solver/acc_lp_solver.h>
 #include <aik_constraint/aik_constraint.h>
 
-namespace prioritized_acc_inverse_kinematics_solver_sample{
-  void sample11_wrench(){
+namespace acc_lp_solver_sample{
+  void sample1(){
     // setup robot
     cnoid::BodyLoader bodyLoader;
     cnoid::BodyPtr robot = bodyLoader.load(ros::package::getPath("choreonoid") + "/share/model/SR1/SR1.body");
@@ -47,8 +46,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     viewer.objects(robot);
 
     // setup task
-    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints0;
-    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints2;
+    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints;
 
     // setup Force
     std::vector<std::shared_ptr<aik_constraint::Force> > forces;
@@ -79,20 +77,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
         constraint->C().insert(8,2) = 0.09; constraint->C().insert(8,4) = -1.0;
         constraint->C().insert(9,2) = 0.005; constraint->C().insert(9,5) = 1.0;
         constraint->C().insert(10,2) = 0.005; constraint->C().insert(10,5) = -1.0;
-        constraints0.push_back(constraint);
-      }
-      {
-        std::shared_ptr<aik_constraint::ForceConstraint> constraint = std::make_shared<aik_constraint::ForceConstraint>();
-        constraint->force() = force;
-        constraint->dl() = Eigen::VectorXd::Zero(5);
-        constraint->C().resize(5,6);
-        constraint->du() = Eigen::VectorXd::Zero(5);
-        constraint->C().insert(0,0) = 1e0;
-        constraint->C().insert(1,1) = 1e0;
-        constraint->C().insert(2,3) = 1e0;
-        constraint->C().insert(3,4) = 1e0;
-        constraint->C().insert(4,5) = 1e0;
-        constraints2.push_back(constraint);
+        constraints.push_back(constraint);
       }
     }
     {
@@ -121,59 +106,51 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
         constraint->C().insert(8,2) = 0.09; constraint->C().insert(8,4) = -1.0;
         constraint->C().insert(9,2) = 0.005; constraint->C().insert(9,5) = 1.0;
         constraint->C().insert(10,2) = 0.005; constraint->C().insert(10,5) = -1.0;
-        constraints0.push_back(constraint);
+        constraints.push_back(constraint);
       }
-      {
-        std::shared_ptr<aik_constraint::ForceConstraint> constraint = std::make_shared<aik_constraint::ForceConstraint>();
-        constraint->force() = force;
-        constraint->dl() = Eigen::VectorXd::Zero(5);
-        constraint->C().resize(5,6);
-        constraint->du() = Eigen::VectorXd::Zero(5);
-        constraint->C().insert(0,0) = 1e0;
-        constraint->C().insert(1,1) = 1e0;
-        constraint->C().insert(2,3) = 1e0;
-        constraint->C().insert(3,4) = 1e0;
-        constraint->C().insert(4,5) = 1e0;
-        constraints2.push_back(constraint);
-      }
-
     }
 
-    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints1;
     {
       // task: EOM
       std::shared_ptr<aik_constraint::EOMConstraint> constraint = std::make_shared<aik_constraint::EOMConstraint>();
       constraint->robot() = robot;
-      constraints1.push_back(constraint);
+      constraints.push_back(constraint);
     }
 
-    int debugLevel = 2; // 0 or 1 or 2
-    std::vector<std::shared_ptr<prioritized_qp_base::Task> > tasks;
+    // target
+    std::shared_ptr<aik_constraint::Force> force = std::make_shared<aik_constraint::Force>();
+    force->A_link() = nullptr;
+    force->A_localpos().translation() = robot->centerOfMass();
+    force->B_link() = robot->rootLink();
+    force->S().resize(6,1);
+    force->S().insert(0,0) = 0.0;
+    force->S().insert(1,0) = 1.0;
+    force->S().insert(2,0) = 0.0;
+    force->F() = cnoid::VectorX::Zero(1);
+    forces.push_back(force);
+
+    int debugLevel = 1; // 0 or 1 or 2
     std::vector<cnoid::LinkPtr> variables;
-    std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > > constraints{constraints0,constraints1,constraints2};
     for(size_t i=0;i<constraints.size();i++){
-      for(size_t j=0;j<constraints[i].size();j++){
-        constraints[i][j]->debugLevel() = debugLevel;//debug
-      }
+      constraints[i]->debugLevel() = debugLevel;//debug
     }
 
-    prioritized_acc_inverse_kinematics_solver::IKParam param;
+    acc_lp_solver::IKParam param;
     param.debugLevel = debugLevel;
-    bool solved = prioritized_acc_inverse_kinematics_solver::solveAIK(variables,
-                                                                      forces,
-                                                                      constraints,
-                                                                      tasks,
-                                                                      param);
+    //param.lpTolerance = 1e-7;
+    bool solved = acc_lp_solver::solveLP(force,
+                                         variables,
+                                         forces,
+                                         constraints,
+                                         param);
     if(!solved) std::cerr << "!solved" << std::endl;
     else std::cerr << "solved" << std::endl;
 
     // visualize
     std::vector<cnoid::SgNodePtr> markers;
     for(int j=0;j<constraints.size();j++){
-      for(int k=0;k<constraints[j].size(); k++){
-        const std::vector<cnoid::SgNodePtr>& marker = constraints[j][k]->getDrawOnObjects();
-        std::copy(marker.begin(), marker.end(), std::back_inserter(markers));
-      }
+      const std::vector<cnoid::SgNodePtr>& marker = constraints[j]->getDrawOnObjects();
+      std::copy(marker.begin(), marker.end(), std::back_inserter(markers));
     }
     for(int j=0;j<forces.size();j++){
       const std::vector<cnoid::SgNodePtr>& marker = forces[j]->getDrawOnObjects();
