@@ -115,7 +115,7 @@ namespace acc_lp_solver {
       std::cerr << result.transpose() << std::endl;
     }
 
-    {
+    if(!param.updateTargetForceOnly) {
       size_t idx = 0;
       for(size_t i=0;i<variables.size();i++){
         if(variables[i]->isRevoluteJoint() || variables[i]->isPrismaticJoint()){
@@ -131,6 +131,15 @@ namespace acc_lp_solver {
       }
       for(size_t i=0;i<forces.size();i++){
         forces[i]->F() += result.segment(idx,forces[i]->DOF());
+        idx += forces[i]->DOF();
+      }
+    }else{
+      size_t idx = ddqdim;
+      for(size_t i=0;i<forces.size();i++){
+        if(forces[i] == force){
+          force->F() += result.segment(idx,force->DOF());
+          break;
+        }
         idx += forces[i]->DOF();
       }
     }

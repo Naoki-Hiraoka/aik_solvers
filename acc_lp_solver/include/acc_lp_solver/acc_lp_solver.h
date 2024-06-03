@@ -17,6 +17,7 @@ namespace acc_lp_solver {
     int debugLevel = 0;
     double maxValue = 1e5; // 接触力を表す変数の最大・最小値. 制約A,Cがゆるい場合、無限に力を発揮可能なためLPの解が定まらないことから、maxValueで制限する.
     double lpTolerance = 1e-7;//default 1e-7. vertexを見逃さないようにする. 1e-12などにする
+    bool updateTargetForceOnly = false;
   };
   bool solveLP (const std::shared_ptr<aik_constraint::Force>& force,
                 const std::vector<cnoid::LinkPtr>& variables,

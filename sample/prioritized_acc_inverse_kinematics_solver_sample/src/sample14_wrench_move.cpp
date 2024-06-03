@@ -184,15 +184,14 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       }
     }
 
-    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints1;
     {
       // task: EOM
       std::shared_ptr<aik_constraint::EOMConstraint> constraint = std::make_shared<aik_constraint::EOMConstraint>();
       constraint->robot() = robot;
-      constraints1.push_back(constraint);
+      constraints0.push_back(constraint);
     }
 
-    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints2;
+    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints1;
     {
       // task: rleg to target
       std::shared_ptr<aik_constraint::PositionConstraint> constraint = std::make_shared<aik_constraint::PositionConstraint>();
@@ -200,7 +199,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.04);
       constraint->B_link() = nullptr;
       constraint->B_localpos().translation() = cnoid::Vector3(0.0,-0.1,0.0);
-      constraints2.push_back(constraint);
+      constraints1.push_back(constraint);
     }
     {
       // task: lleg to target
@@ -209,10 +208,10 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       constraint->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.04);
       constraint->B_link() = nullptr;
       constraint->B_localpos().translation() = cnoid::Vector3(0.0,0.1,0.0);
-      constraints2.push_back(constraint);
+      constraints1.push_back(constraint);
     }
 
-    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints3;
+    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints2;
     std::shared_ptr<aik_constraint::COMConstraint> comconstraint;
     {
       // task: COM to target
@@ -220,11 +219,11 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       constraint->A_robot() = robot;
       constraint->B_localp() = cnoid::Vector3(0.0,0.0,0.7);
       constraint->weight() << 1.0, 1.0, 0.3;
-      constraints3.push_back(constraint);
+      constraints2.push_back(constraint);
       comconstraint = constraint;
     }
 
-    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints4;
+    std::vector<std::shared_ptr<aik_constraint::IKConstraint> > constraints3;
     {
       // task: joint angle to target
       for(int i=0;i<robot->numJoints();i++){
@@ -232,7 +231,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
         constraint->joint() = robot->joint(i);
         constraint->targetq() = reset_manip_pose[i];
         constraint->weight() = 1.0;
-        constraints4.push_back(constraint);
+        constraints3.push_back(constraint);
       }
     }
     {
@@ -240,7 +239,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       std::shared_ptr<aik_constraint::AngularMomentumConstraint> constraint = std::make_shared<aik_constraint::AngularMomentumConstraint>();
       constraint->robot() = robot;
       constraint->weight() = 1.0 * cnoid::Vector3::Ones();
-      constraints4.push_back(constraint);
+      constraints3.push_back(constraint);
     }
 
     int debugLevel = 1; // 0 or 1 or 2
@@ -250,7 +249,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     for(size_t i=0;i<robot->numJoints();i++){
       variables.push_back(robot->joint(i));
     }
-    std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > > constraints{constraints0,constraints1,constraints2,constraints3,constraints4};
+    std::vector<std::vector<std::shared_ptr<aik_constraint::IKConstraint> > > constraints{constraints0,constraints1,constraints2,constraints3};
     for(size_t i=0;i<constraints.size();i++){
       for(size_t j=0;j<constraints[i].size();j++){
         constraints[i][j]->debugLevel() = debugLevel;//debug
