@@ -8,7 +8,7 @@
 namespace aik_constraint {
   class Force {
   public:
-    // Jointと同様に、基本的に一度Forceオブジェクトが生成されたら、F以外の値 (A_link, A_localpos, B_link, S, DOF)は変化しないものとする. Forceオブジェクトを指すポインタが前回の周期と同じであれば、これらの値は前回の周期と同じであるとみなしてキャッシュ利用してよい.
+    // Jointと同様に、基本的に一度Forceオブジェクトが生成されたら、F以外の値 (A_link, B_link, S, DOF)は変化しないものとする. Forceオブジェクトを指すポインタが前回の周期と同じであれば、これらの値は前回の周期と同じであるとみなしてキャッシュ利用してよい.
 
     // A_linkとB_linkが, A_linkのA_localposの位置で接触する.
     // nullptrの場合、worldを意味する.
