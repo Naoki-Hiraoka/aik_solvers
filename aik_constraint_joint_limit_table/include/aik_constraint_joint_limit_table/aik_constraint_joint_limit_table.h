@@ -1,0 +1,6 @@
+#ifndef AIK_CONSTRAINT_JOINTLIMITTABLE_AIK_CONSTRAINT_JOINTLIMITTABLE_H
+#define AIK_CONSTRAINT_JOINTLIMITTABLE_AIK_CONSTRAINT_JOINTLIMITTABLE_H
+
+#include <aik_constraint_joint_limit_table/JointLimitMinMaxTableConstraint.h>
+
+#endif
