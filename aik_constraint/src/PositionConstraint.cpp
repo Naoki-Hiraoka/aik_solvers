@@ -126,7 +126,7 @@ namespace aik_constraint{
     }
 
     if(this->debugLevel_>=2){
-      std::cerr << "PositionConstraint" << std::endl;
+      std::cerr << "PositionConstraint " << (this->A_link_ ? this->A_link_->name() : std::string("")) << " : " << (this->B_link_ ? this->B_link_->name() : std::string("")) << std::endl;
       std::cerr << "A_pos" << std::endl;
       std::cerr << A_pos.translation().transpose() << std::endl;
       std::cerr << A_pos.linear() << std::endl;
