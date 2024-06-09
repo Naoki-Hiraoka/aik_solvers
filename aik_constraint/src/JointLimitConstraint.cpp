@@ -70,7 +70,7 @@ namespace aik_constraint{
 
 
     if(this->debugLevel_>=2){
-      std::cerr << "JointLimitConstraint" << std::endl;
+      std::cerr << "JointLimitConstraint: " << (this->joint_? this->joint_->name() : std::string("")) << std::endl;
       std::cerr << "q_lower q q_upper dq" << std::endl;
       std::cerr << this->joint_->q_lower() << " " << this->joint_->q() << " " << this->joint_->q_upper() << " " << this->joint_->dq() << std::endl;
       std::cerr << "minineq maxineq" << std::endl;
