@@ -202,7 +202,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     for(int i=0;i< 300 / dt;i++){
       prioritized_acc_inverse_kinematics_solver::IKParam param;
       param.debugLevel = debugLevel;
-      param.ddqWeight = 1e-3;
+      param.ddqWeight = 1e-2;
       param.forceWeight = 1e-12;
       bool solved = prioritized_acc_inverse_kinematics_solver::solveAIK(variables,
                                                                         forces,
