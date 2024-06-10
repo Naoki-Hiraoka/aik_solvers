@@ -304,7 +304,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
 
       prioritized_acc_inverse_kinematics_solver::IKParam param;
       param.debugLevel = debugLevel;
-      param.ddqWeight = 1e-6;
+      param.ddqWeight = 1e-3;
       param.forceWeight = 1e-12;
       bool solved = prioritized_acc_inverse_kinematics_solver::solveAIK(variables,
                                                                         forces,
@@ -362,6 +362,10 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       cnoid::Vector6 F_o = cnoid::calcInverseDynamics(robot->rootLink()); // world frame origin
       robot->rootLink()->F_ext().head<3>() = F_o.head<3>(); // rootLink origin
       robot->rootLink()->F_ext().tail<3>() = F_o.tail<3>() + (-robot->rootLink()->p()).cross(F_o.head<3>()); // rootLink origin
+
+      for(int i=0;i<forces.size();i++){
+        forces[i]->F().setZero();
+      }
 
       // sleep
       std::this_thread::sleep_for(std::chrono::milliseconds(int(dt * 1000 / 2)));
