@@ -31,6 +31,7 @@ namespace aik_constraint{
     std::vector<cnoid::LinkPtr> jacobian_joints_; // 前回のjacobian計算時のjoints
     std::vector<std::shared_ptr<Force> > jacobian_forces_; // 前回のjacobian計算時のforces
 
+    bool hasJoints_ = true; // jointsにrobotの関節が含まれているか
     Eigen::SparseMatrix<double,Eigen::RowMajor> CMJacobian_;
     std::unordered_map<cnoid::LinkPtr,int> CMJacobian_ColMap_;
     Eigen::SparseMatrix<double,Eigen::RowMajor> AMJacobian_;

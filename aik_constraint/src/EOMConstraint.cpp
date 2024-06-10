@@ -36,18 +36,29 @@ namespace aik_constraint {
       this->AMJacobian_ColMap_.clear();
       this->jacobian_forces_ColMap_.clear();
 
-      aik_constraint::calcCMJacobianShape(this->jacobian_joints_,
-                                          this->jacobian_forces_,
-                                          this->jacobian_robot_,
-                                          nullptr,
-                                          this->CMJacobian_,
-                                          this->CMJacobian_ColMap_);
-      aik_constraint::calcAngularMomentumJacobianShape(this->jacobian_joints_,
-                                                       this->jacobian_forces_,
-                                                       this->jacobian_robot_,
-                                                       nullptr,
-                                                       this->AMJacobian_,
-                                                       this->AMJacobian_ColMap_);
+      this->hasJoints_ = false;
+      for(int i=0;i<joints.size();i++){
+        if(joints[i]->body() == this->robot_) {
+          this->hasJoints_ = true;
+          break;
+        }
+      }
+
+      if(this->hasJoints_){
+        aik_constraint::calcCMJacobianShape(this->jacobian_joints_,
+                                            this->jacobian_forces_,
+                                            this->jacobian_robot_,
+                                            nullptr,
+                                            this->CMJacobian_,
+                                            this->CMJacobian_ColMap_);
+        aik_constraint::calcAngularMomentumJacobianShape(this->jacobian_joints_,
+                                                         this->jacobian_forces_,
+                                                         this->jacobian_robot_,
+                                                         nullptr,
+                                                         this->AMJacobian_,
+                                                         this->AMJacobian_ColMap_);
+      }
+
       int cols = 0;
       for(size_t i=0; i < this->jacobian_joints_.size(); i++){
         cols += this->getJointDOF(this->jacobian_joints_[i]);
@@ -61,30 +72,34 @@ namespace aik_constraint {
       this->forcejacobian_ = Eigen::SparseMatrix<double,Eigen::ColMajor>(6,cols);
     }
 
-    Eigen::MatrixXd CMJ;
-    if(this->robot_) cnoid::calcCMJacobian(this->robot_,nullptr,CMJ); // [joint root]の順
-    aik_constraint::calcCMJacobianCoef(this->jacobian_joints_,
-                                       this->jacobian_forces_,
-                                       this->jacobian_robot_,
-                                       nullptr,
-                                       CMJ,// not used
-                                       CMJ,//tmp
-                                       this->CMJacobian_ColMap_,
-                                       this->CMJacobian_);
-    this->jacobian_.topRows<3>() = - this->CMJacobian_ * this->robot_->mass() * this->weight_;
+    if(this->hasJoints_){
+      Eigen::MatrixXd CMJ;
+      if(this->robot_) cnoid::calcCMJacobian(this->robot_,nullptr,CMJ); // [joint root]の順
+      aik_constraint::calcCMJacobianCoef(this->jacobian_joints_,
+                                         this->jacobian_forces_,
+                                         this->jacobian_robot_,
+                                         nullptr,
+                                         CMJ,// not used
+                                         CMJ,//tmp
+                                         this->CMJacobian_ColMap_,
+                                         this->CMJacobian_);
+      this->jacobian_.topRows<3>() = - this->CMJacobian_ * this->robot_->mass() * this->weight_;
+    }
     this->eq_.head<3>() += this->robot_->rootLink()->F_ext().head<3>() * this->weight_;
 
-    Eigen::MatrixXd AMJ;
-    cnoid::calcAngularMomentumJacobian(this->robot_,nullptr,AMJ); // [joint root]の順. comまわり
-    aik_constraint::calcAngularMomentumJacobianCoef(this->jacobian_joints_,
-                                                    this->jacobian_forces_,
-                                                    this->jacobian_robot_,
-                                                    nullptr,
-                                                    AMJ,
-                                                    AMJ,// not used
-                                                    this->AMJacobian_ColMap_,
-                                                    this->AMJacobian_);
-    this->jacobian_.bottomRows<3>() = - this->AMJacobian_ * this->weight_;
+    if(this->hasJoints_){
+      Eigen::MatrixXd AMJ;
+      cnoid::calcAngularMomentumJacobian(this->robot_,nullptr,AMJ); // [joint root]の順. comまわり
+      aik_constraint::calcAngularMomentumJacobianCoef(this->jacobian_joints_,
+                                                      this->jacobian_forces_,
+                                                      this->jacobian_robot_,
+                                                      nullptr,
+                                                      AMJ,
+                                                      AMJ,// not used
+                                                      this->AMJacobian_ColMap_,
+                                                      this->AMJacobian_);
+      this->jacobian_.bottomRows<3>() = - this->AMJacobian_ * this->weight_;
+    }
     this->eq_.tail<3>() += (this->robot_->rootLink()->F_ext().tail<3>()/*root周り*/
                             + (this->robot_->rootLink()->p() - this->robot_->centerOfMass()).cross(this->robot_->rootLink()->F_ext().head<3>())) * this->weight_;
 
