@@ -105,6 +105,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
     robot->rootLink()->F_ext().head<3>() = F_o.head<3>(); // rootLink origin
     robot->rootLink()->F_ext().tail<3>() = F_o.tail<3>() + (-robot->rootLink()->p()).cross(F_o.head<3>()); // rootLink origin
 
+    double forceRatio = 1e-2;
 
     // setup viewer
     choreonoid_viewer::Viewer viewer;
@@ -123,6 +124,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       force->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.045);
       force->B_link() = nullptr;
       aik_constraint::Force::setFACE(force);
+      force->S() /= forceRatio;
       forces.push_back(force);
 
       std::shared_ptr<aik_constraint::ForceConstraint> constraint = std::make_shared<aik_constraint::ForceConstraint>();
@@ -141,6 +143,8 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       constraint->C().insert(8,2) = 0.09; constraint->C().insert(8,4) = -1.0;
       constraint->C().insert(9,2) = 0.005; constraint->C().insert(9,5) = 1.0;
       constraint->C().insert(10,2) = 0.005; constraint->C().insert(10,5) = -1.0;
+      constraint->du() *= forceRatio;
+      constraint->dl() *= forceRatio;
       constraints0.push_back(constraint);
 
     }
@@ -151,6 +155,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       force->A_localpos().translation() = cnoid::Vector3(0.0,0.0,-0.045);
       force->B_link() = nullptr;
       aik_constraint::Force::setFACE(force);
+      force->S() /= forceRatio;
       forces.push_back(force);
 
       std::shared_ptr<aik_constraint::ForceConstraint> constraint = std::make_shared<aik_constraint::ForceConstraint>();
@@ -169,6 +174,8 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       constraint->C().insert(8,2) = 0.09; constraint->C().insert(8,4) = -1.0;
       constraint->C().insert(9,2) = 0.005; constraint->C().insert(9,5) = 1.0;
       constraint->C().insert(10,2) = 0.005; constraint->C().insert(10,5) = -1.0;
+      constraint->du() *= forceRatio;
+      constraint->dl() *= forceRatio;
       constraints0.push_back(constraint);
 
     }
@@ -188,6 +195,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       // task: EOM
       std::shared_ptr<aik_constraint::EOMConstraint> constraint = std::make_shared<aik_constraint::EOMConstraint>();
       constraint->robot() = robot;
+      constraint->weight() *= forceRatio;
       constraints0.push_back(constraint);
     }
 
@@ -305,7 +313,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       prioritized_acc_inverse_kinematics_solver::IKParam param;
       param.debugLevel = debugLevel;
       param.ddqWeight = 1e-2;
-      param.forceWeight = 1e-12;
+      param.forceWeight = 1e-12 / std::pow(forceRatio,2);
       bool solved = prioritized_acc_inverse_kinematics_solver::solveAIK(variables,
                                                                         forces,
                                                                         constraints,
