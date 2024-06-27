@@ -30,6 +30,7 @@ add_library(${PROJECT_NAME}
   src/Force.cpp
   src/IKConstraint.cpp
   src/PositionConstraint.cpp
+  src/RegionConstraint.cpp
   src/COMConstraint.cpp
   # src/COMVelocityConstraint.cpp
   src/AngularMomentumConstraint.cpp

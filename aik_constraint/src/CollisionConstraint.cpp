@@ -76,16 +76,12 @@ namespace aik_constraint{
                                             );
     }
 
-    cnoid::Isometry3 A_localpos = cnoid::Isometry3::Identity();
-    A_localpos.translation() = this->A_currentLocalp_;
-    cnoid::Isometry3 B_localpos = cnoid::Isometry3::Identity();
-    B_localpos.translation() = this->B_currentLocalp_;
     aik_constraint::calc6DofJacobianCoef(this->jacobianIneq_joints_,//input
                                          this->jacobianIneq_forces_,//input
                                          this->jacobianIneq_A_link_,//input
-                                         A_localpos,//input
+                                         this->A_currentLocalp_,//input
                                          this->jacobianIneq_B_link_,//input
-                                         B_localpos,//input
+                                         this->B_currentLocalp_,//input
                                          this->jacobianIneqColMap_,//input
                                          this->path_A_joints_,//input
                                          this->path_B_joints_,//input

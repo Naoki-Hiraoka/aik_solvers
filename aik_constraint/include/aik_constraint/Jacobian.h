@@ -38,9 +38,9 @@ namespace aik_constraint {
   void calc6DofJacobianCoef(const std::vector<cnoid::LinkPtr>& joints, //input
                             const std::vector<std::shared_ptr<Force> >& forces, //input
                             const cnoid::LinkPtr& A_link, //input
-                            const cnoid::Isometry3& A_localpos, //input
+                            const cnoid::Vector3& A_localpos, //input
                             const cnoid::LinkPtr& B_link, //input
-                            const cnoid::Isometry3& B_localpos, //input
+                            const cnoid::Vector3& B_localpos, //input
                             std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
                             const std::vector<cnoid::LinkPtr>& path_A_joints, //input
                             const std::vector<cnoid::LinkPtr>& path_B_joints, //input

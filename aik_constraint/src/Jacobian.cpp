@@ -168,9 +168,9 @@ namespace aik_constraint {
   void calc6DofJacobianCoef(const std::vector<cnoid::LinkPtr>& joints, //input
                             const std::vector<std::shared_ptr<Force> >& forces, //input
                             const cnoid::LinkPtr& A_link, //input
-                            const cnoid::Isometry3& A_localpos, //input
+                            const cnoid::Vector3& A_localpos, //input
                             const cnoid::LinkPtr& B_link, //input
-                            const cnoid::Isometry3& B_localpos, //input
+                            const cnoid::Vector3& B_localpos, //input
                             std::unordered_map<cnoid::LinkPtr,int>& jacobianColMap, //input
                             const std::vector<cnoid::LinkPtr>& path_A_joints, //input
                             const std::vector<cnoid::LinkPtr>& path_B_joints, //input
@@ -184,13 +184,12 @@ namespace aik_constraint {
       for(size_t i=0;i<2;i++){//0:A_link, 1:B_link
         int sign = i ? -1 : 1;
         cnoid::LinkPtr target_link = i ? B_link : A_link;
-        const cnoid::Isometry3& target_localpos = i ? B_localpos : A_localpos;
+        const cnoid::Vector3& target_localpos = i ? B_localpos : A_localpos;
         const std::vector<cnoid::LinkPtr>& path_joints = i ? path_B_joints : path_A_joints;
 
         if(!target_link) continue;//world固定なので飛ばす
 
-        const cnoid::Isometry3 target_position = target_link->T() * target_localpos;
-        const cnoid::Vector3 target_p = target_position.translation();
+        const cnoid::Vector3 target_p = target_link->T() * target_localpos;
 
         for(size_t j=0;j<path_joints.size();j++){
           cnoid::LinkPtr joint = path_joints[j];
@@ -201,7 +200,7 @@ namespace aik_constraint {
       }
     } else { //if(!A_link || !B_link || !(A_link->body() == B_link->body()))
       //A,Bが関節を共有する. 一つのpathで考える
-      const cnoid::Vector3& target_p = A_link->T() * A_localpos.translation();
+      const cnoid::Vector3& target_p = A_link->T() * A_localpos;
       for(size_t j=0;j<path_BA_joints.size();j++){
           cnoid::LinkPtr joint = path_BA_joints[j];
           if(jacobianColMap.find(joint)==jacobianColMap.end()) continue;

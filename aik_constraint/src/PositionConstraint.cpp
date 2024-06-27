@@ -43,6 +43,7 @@ namespace aik_constraint{
       pos_error << A_pos.translation() - B_pos.translation() , angleAxis.angle()*angleAxis.axis();
     }
     cnoid::Vector6 vel_error = A_vel - B_vel; // world frame. A - B
+    cnoid::Vector6 acc_error = A_acc - B_acc; // world frame. A - B
 
     cnoid::Matrix3d eval_R = (this->eval_link_) ? this->eval_link_->R() * this->eval_localR_ : this->eval_localR_;
     cnoid::Vector6 pos_error_eval; // eval frame. A - B
@@ -51,11 +52,14 @@ namespace aik_constraint{
     cnoid::Vector6 vel_error_eval; // eval frame. A - B
     vel_error_eval.head<3>() = (eval_R.transpose() * vel_error.head<3>()).eval();
     vel_error_eval.tail<3>() = (eval_R.transpose() * vel_error.tail<3>()).eval();
+    cnoid::Vector6 acc_error_eval; // eval frame. A - B
+    acc_error_eval.head<3>() = (eval_R.transpose() * acc_error.head<3>()).eval();
+    acc_error_eval.tail<3>() = (eval_R.transpose() * acc_error.tail<3>()).eval();
     cnoid::Vector6 target_acc = cnoid::Vector6::Zero(); // eval frame. A - B
     target_acc += this->ref_acc_;
     target_acc -= this->clamp(cnoid::Vector6(this->pgain_.cwiseProduct(pos_error_eval)), this->maxAccByPosError_);
     target_acc -= this->clamp(cnoid::Vector6(this->dgain_.cwiseProduct(vel_error_eval)), this->maxAccByVelError_);
-    target_acc -= A_acc - B_acc;
+    target_acc -= acc_error_eval;
     target_acc = this->clamp(target_acc, this->maxAcc_);
 
     {
@@ -97,9 +101,9 @@ namespace aik_constraint{
       aik_constraint::calc6DofJacobianCoef(this->jacobian_joints_,//input
                                            this->jacobian_forces_,//input
                                            this->jacobian_A_link_,//input
-                                           this->A_localpos_,//input
+                                           this->A_localpos_.translation(),//input
                                            this->jacobian_B_link_,//input
-                                           this->B_localpos_,//input
+                                           this->B_localpos_.translation(),//input
                                            this->jacobianColMap_,//input
                                            this->path_A_joints_,//input
                                            this->path_B_joints_,//input

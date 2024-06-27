@@ -139,6 +139,16 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
   };
   typedef cnoid::ref_ptr<sample15_jaxon_limitItem> sample15_jaxon_limitItemPtr;
 
+  void sample16_4limb_region();
+  class sample16_4limb_regionItem : public choreonoid_viewer::ViewerBaseItem {
+  public:
+    static void initializeClass(cnoid::ExtensionManager* ext){ ext->itemManager().registerClass<sample16_4limb_regionItem>("sample16_4limb_regionItem"); }
+  protected:
+    virtual void main() override{ sample16_4limb_region(); return; }
+  };
+  typedef cnoid::ref_ptr<sample16_4limb_regionItem> sample16_4limb_regionItemPtr;
+
+
   class PrioritizedAccInverseKinematicsSolverSamplePlugin : public cnoid::Plugin
   {
   public:
@@ -164,6 +174,7 @@ namespace prioritized_acc_inverse_kinematics_solver_sample{
       sample13_wrench_ikItem::initializeClass(this);
       sample14_wrench_moveItem::initializeClass(this);
       sample15_jaxon_limitItem::initializeClass(this);
+      sample16_4limb_regionItem::initializeClass(this);
       return true;
     }
   };
