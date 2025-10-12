@@ -1,4 +1,4 @@
-#include <prioritized_acc_inverse_kinematics_solver/PrioritizedAccInverseKinematicsSolver.h>
+#include <prioritized_acc_inverse_kinematics_solver/prioritized_acc_inverse_kinematics_solver.h>
 #include <Eigen/Sparse>
 #include <iostream>
 #include <iomanip>
