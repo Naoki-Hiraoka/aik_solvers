@@ -84,6 +84,8 @@ namespace aik_constraint {
                                          this->CMJacobian_ColMap_,
                                          this->CMJacobian_);
       this->jacobian_.topRows<3>() = - this->CMJacobian_ * this->robot_->mass() * this->weight_;
+    }else{
+      this->jacobian_.topRows<3>() *= 0.0;
     }
     this->eq_.head<3>() += this->robot_->rootLink()->F_ext().head<3>() * this->weight_;
 
@@ -99,6 +101,8 @@ namespace aik_constraint {
                                                       this->AMJacobian_ColMap_,
                                                       this->AMJacobian_);
       this->jacobian_.bottomRows<3>() = - this->AMJacobian_ * this->weight_;
+    }else{
+      this->jacobian_.bottomRows<3>() *= 0.0;
     }
     this->eq_.tail<3>() += (this->robot_->rootLink()->F_ext().tail<3>()/*root周り*/
                             + (this->robot_->rootLink()->p() - this->robot_->centerOfMass()).cross(this->robot_->rootLink()->F_ext().head<3>())) * this->weight_;
