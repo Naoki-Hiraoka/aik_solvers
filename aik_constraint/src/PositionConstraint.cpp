@@ -8,33 +8,47 @@ namespace aik_constraint{
     const cnoid::Isometry3 B_parent_pose = (this->B_link_) ? this->B_link_->T() : cnoid::Isometry3::Identity(); // world frame
     const cnoid::Isometry3& A_pos = A_parent_pose * this->A_localpos_; // world frame
     const cnoid::Isometry3& B_pos = B_parent_pose * this->B_localpos_; // world frame
-    cnoid::Vector6 A_vel = cnoid::Vector6::Zero(); // world frame
+    const cnoid::Vector3 A_arm = A_parent_pose.linear() * this->A_localpos_.translation();
+    const cnoid::Vector3 B_arm = B_parent_pose.linear() * this->B_localpos_.translation();
+    cnoid::Vector6 A_vel = cnoid::Vector6::Zero(); // world frame. local origin
     if(this->A_link_){
-      A_vel.head<3>() += this->A_link_->v();
-      A_vel.head<3>() += this->A_link_->w().cross(A_parent_pose.linear() * this->A_localpos_.translation());
+      A_vel.head<3>() +=
+        this->A_link_->v()
+        + this->A_link_->w().cross(A_arm);
       A_vel.tail<3>() += this->A_link_->w();
     }
     A_vel.head<3>() += A_parent_pose.linear() * this->A_localvel_.head<3>();
     A_vel.tail<3>() += A_parent_pose.linear() * this->A_localvel_.tail<3>();
-    cnoid::Vector6 B_vel = cnoid::Vector6::Zero(); // world frame
+    cnoid::Vector6 B_vel = cnoid::Vector6::Zero(); // world frame. local origin
     if(this->B_link_){
-      B_vel.head<3>() += this->B_link_->v();
-      B_vel.head<3>() += this->B_link_->w().cross(B_parent_pose.linear() * this->B_localpos_.translation());
+      B_vel.head<3>() +=
+        this->B_link_->v()
+        + this->B_link_->w().cross(B_arm);
       B_vel.tail<3>() += this->B_link_->w();
     }
     B_vel.head<3>() += B_parent_pose.linear() * this->B_localvel_.head<3>();
     B_vel.tail<3>() += B_parent_pose.linear() * this->B_localvel_.tail<3>();
-    cnoid::Vector6 A_acc = cnoid::Vector6::Zero(); // world frame
+    cnoid::Vector6 A_acc = cnoid::Vector6::Zero(); // world frame. local origin
     if(this->A_link_){
-      A_acc.head<3>() += this->A_link_->dv();
-      A_acc.head<3>() += this->A_link_->dw().cross(A_parent_pose.linear() * this->A_localpos_.translation()) + this->A_link_->w().cross(A_parent_pose.linear() * this->A_localvel_.head<3>());
-      A_acc.tail<3>() += this->A_link_->dw();
+      A_acc.head<3>() +=
+        this->A_link_->dv()
+        + this->A_link_->w().cross(this->A_link_->w().cross(A_arm))
+        + this->A_link_->dw().cross(A_arm)
+        + 2 * this->A_link_->w().cross(A_parent_pose.linear() * this->A_localvel_.head<3>());
+      A_acc.tail<3>() +=
+        this->A_link_->dw()
+        + this->A_link_->w().cross(A_parent_pose.linear() * this->A_localvel_.tail<3>());
     }
-    cnoid::Vector6 B_acc = cnoid::Vector6::Zero(); // world frame
+    cnoid::Vector6 B_acc = cnoid::Vector6::Zero(); // world frame. local origin
     if(this->B_link_){
-      B_acc.head<3>() += this->B_link_->dv();
-      B_acc.head<3>() += this->B_link_->dw().cross(B_parent_pose.linear() * this->B_localpos_.translation()) + this->B_link_->w().cross(B_parent_pose.linear() * this->B_localvel_.head<3>());
-      B_acc.tail<3>() += this->B_link_->dw();
+      B_acc.head<3>() +=
+        this->B_link_->dv()
+        + this->B_link_->w().cross(this->B_link_->w().cross(B_arm))
+        + this->B_link_->dw().cross(B_arm)
+        + 2 * this->B_link_->w().cross(B_parent_pose.linear() * this->B_localvel_.head<3>());
+      B_acc.tail<3>() +=
+        this->B_link_->dw()
+        + this->B_link_->w().cross(B_parent_pose.linear() * this->B_localvel_.tail<3>());
     }
 
     cnoid::Vector6 pos_error; // world frame. A - B
@@ -136,11 +150,15 @@ namespace aik_constraint{
       std::cerr << A_pos.linear() << std::endl;
       std::cerr << "A_vel" << std::endl;
       std::cerr << A_vel.transpose() << std::endl;
+      std::cerr << "A_acc" << std::endl;
+      std::cerr << A_acc.transpose() << std::endl;
       std::cerr << "B_pos" << std::endl;
       std::cerr << B_pos.translation().transpose() << std::endl;
       std::cerr << B_pos.linear() << std::endl;
       std::cerr << "B_vel" << std::endl;
       std::cerr << B_vel.transpose() << std::endl;
+      std::cerr << "B_acc" << std::endl;
+      std::cerr << B_acc.transpose() << std::endl;
       std::cerr << "target_acc" << std::endl;
       std::cerr << target_acc.transpose() << std::endl;
       std::cerr << "eq" << std::endl;
