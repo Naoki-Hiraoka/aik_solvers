@@ -56,8 +56,8 @@ namespace aik_constraint{
 
     if(this->debugLevel_>=2){
       std::cerr << "JointAngleConstraint " << ((this->joint_)?this->joint_->name():"") <<  std::endl;
-      std::cerr << "q dq targetq targetdq" << std::endl;
-      std::cerr << this->joint_->q() << " " << this->joint_->dq() << " " << this->targetq_ << " " << this->targetdq_ << std::endl;
+      std::cerr << "q dq targetq targetdq ref_acc" << std::endl;
+      std::cerr << this->joint_->q() << " " << this->joint_->dq() << " " << this->targetq_ << " " << this->targetdq_ << " " << this->ref_acc_ << std::endl;
       std::cerr << "eq" << std::endl;
       std::cerr << this->eq_ << std::endl;
       std::cerr << "jacobian" << std::endl;
